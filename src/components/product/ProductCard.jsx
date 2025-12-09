@@ -1,0 +1,177 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Heart, ShoppingBag, Star, Eye } from 'lucide-react';
+
+const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = false }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const discount = product.originalPrice
+    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+    : 0;
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    if (onAddToCart && !product.isSoldOut) {
+      onAddToCart(product);
+    }
+  };
+
+  const handleToggleFavorite = (e) => {
+    e.preventDefault();
+    if (onToggleFavorite) {
+      onToggleFavorite(product);
+    }
+  };
+
+  return (
+    <Link
+      to={`/product/${product.id}`}
+      className="group block"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-300">
+        {/* Image Container */}
+        <div className="relative aspect-[3/4] overflow-hidden bg-gray-200">
+          {/* Product Image */}
+          <img
+            src={product.image}
+            alt={product.name}
+            className={`w-full h-full object-cover transition-all duration-500 ${
+              isHovered ? 'scale-110' : 'scale-100'
+            } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            onLoad={() => setImageLoaded(true)}
+          />
+
+          {/* Skeleton Loader */}
+          {!imageLoaded && (
+            <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+          )}
+
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col space-y-2">
+            {product.isNew && (
+              <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                NEW
+              </span>
+            )}
+            {discount > 0 && (
+              <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                -{discount}%
+              </span>
+            )}
+            {product.isSoldOut && (
+              <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">
+                SOLD OUT
+              </span>
+            )}
+          </div>
+
+          {/* Favorite Button */}
+          <button
+            onClick={handleToggleFavorite}
+            className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
+              isFavorite
+                ? 'bg-red-500 text-white'
+                : 'bg-white text-gray-700 hover:bg-red-500 hover:text-white'
+            } shadow-md`}
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Heart
+              className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`}
+            />
+          </button>
+
+          {/* Quick Actions (shown on hover) */}
+          <div
+            className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent transition-all duration-300 ${
+              isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            <div className="flex space-x-2">
+              <button
+                onClick={handleAddToCart}
+                disabled={product.isSoldOut}
+                className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
+                  product.isSoldOut
+                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    : 'bg-white text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span className="text-sm">
+                  {product.isSoldOut ? 'Sold Out' : 'Add to Cart'}
+                </span>
+              </button>
+              
+              <button
+                className="p-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Quick view"
+              >
+                <Eye className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Info */}
+        <div className="p-4">
+          {/* Category */}
+          {product.category && (
+            <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+              {product.category}
+            </p>
+          )}
+
+          {/* Product Name */}
+          <h3 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors">
+            {product.name}
+          </h3>
+
+          {/* Rating */}
+          {product.rating && (
+            <div className="flex items-center space-x-1 mb-2">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < Math.floor(product.rating)
+                      ? 'text-yellow-400 fill-current'
+                      : 'text-gray-300'
+                  }`}
+                />
+              ))}
+              {product.reviewCount && (
+                <span className="text-xs text-gray-500 ml-1">
+                  ({product.reviewCount})
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Price */}
+          <div className="flex items-center space-x-2">
+            <span className="text-lg font-bold text-gray-900">
+              ${product.price}
+            </span>
+            {product.originalPrice && (
+              <span className="text-sm text-gray-500 line-through">
+                ${product.originalPrice}
+              </span>
+            )}
+          </div>
+
+          {/* Stock Status */}
+          {!product.isSoldOut && product.stockCount && product.stockCount < 10 && (
+            <p className="text-xs text-orange-500 mt-2">
+              Only {product.stockCount} left in stock!
+            </p>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+export default ProductCard;
