@@ -1,8 +1,20 @@
-import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import ProductCard from '../product/ProductCard';
+import SkeletonLoader from '../ui/SkeletonLoader';
 
-const FeaturedProducts = ({ products, title = 'Featured Products', onAddToCart, onToggleFavorite, favorites = [] }) => {
+const FeaturedProducts = ({ products, title = 'Öne Çıkan Ürünler', onAddToCart, onToggleFavorite, favorites = [] }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Simulate loading for initial render
+  useEffect(() => {
+    if (products && products.length > 0) {
+      const timer = setTimeout(() => setIsLoading(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [products]);
+
   // Show only first 8 products if more are provided
   const displayedProducts = products.slice(0, 8);
 
@@ -16,7 +28,7 @@ const FeaturedProducts = ({ products, title = 'Featured Products', onAddToCart, 
               {title}
             </h2>
             <p className="text-gray-600">
-              Handpicked items from our curated collections
+              Özenle seçilmiş koleksiyonlardan ürünler
             </p>
           </div>
           
@@ -24,22 +36,29 @@ const FeaturedProducts = ({ products, title = 'Featured Products', onAddToCart, 
             to="/shop"
             className="hidden md:flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
           >
-            <span>View All</span>
+            <span>Tümünü Gör</span>
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {displayedProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onAddToCart={onAddToCart}
-              onToggleFavorite={onToggleFavorite}
-              isFavorite={favorites.includes(product.id)}
-            />
-          ))}
+          {isLoading ? (
+            // Show skeleton loaders while loading
+            Array.from({ length: 8 }).map((_, index) => (
+              <SkeletonLoader key={index} variant="product-card" />
+            ))
+          ) : (
+            displayedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onAddToCart={onAddToCart}
+                onToggleFavorite={onToggleFavorite}
+                isFavorite={favorites.includes(product.id)}
+              />
+            ))
+          )}
         </div>
 
         {/* Mobile View All Button */}
@@ -48,7 +67,7 @@ const FeaturedProducts = ({ products, title = 'Featured Products', onAddToCart, 
             to="/shop"
             className="flex items-center space-x-2 bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
-            <span>View All Products</span>
+            <span>Tüm Ürünler</span>
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

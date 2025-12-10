@@ -1,13 +1,13 @@
+import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Minus, Plus, Trash2, ArrowRight, ShoppingBag } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 
 const CartPage = () => {
   const { cart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount } = useShop();
 
   const subtotal = getCartTotal();
-  const shipping = subtotal > 100 ? 0 : 15;
-  const tax = subtotal * 0.08; // 8% tax
+  const shipping = subtotal > 500 ? 0 : 50;
+  const tax = subtotal * 0.20; // KDV 20%
   const total = subtotal + shipping + tax;
 
   if (cart.length === 0) {
@@ -17,16 +17,16 @@ const CartPage = () => {
           <div className="text-center">
             <ShoppingBag className="w-24 h-24 text-gray-300 mx-auto mb-6" />
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Your Cart is Empty
+              Sepetiniz Boş
             </h2>
             <p className="text-gray-600 mb-8">
-              Looks like you haven't added anything to your cart yet.
+              Sepetinize henüz bir şey eklemediniz.
             </p>
             <Link
               to="/shop"
               className="inline-flex items-center space-x-2 bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
             >
-              <span>Continue Shopping</span>
+              <span>Alışverişe Devam Et</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -41,10 +41,10 @@ const CartPage = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Shopping Cart
+            Alışveriş Sepeti
           </h1>
           <p className="text-gray-600">
-            {getCartCount()} {getCartCount() === 1 ? 'item' : 'items'} in your cart
+            Sepetinizde {getCartCount()} {getCartCount() === 1 ? 'ürün' : 'ürün'} var
           </p>
         </div>
 
@@ -87,7 +87,7 @@ const CartPage = () => {
                     <button
                       onClick={() => removeFromCart(item.id)}
                       className="hidden sm:block p-2 text-gray-400 hover:text-red-500 transition-colors"
-                      aria-label="Remove from cart"
+                      aria-label="Sepetten çıkar"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
@@ -100,7 +100,7 @@ const CartPage = () => {
                       <button
                         onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
                         className="p-1 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
-                        aria-label="Decrease quantity"
+                        aria-label="Azalt"
                       >
                         <Minus className="w-4 h-4" />
                       </button>
@@ -112,7 +112,7 @@ const CartPage = () => {
                       <button
                         onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
                         className="p-1 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
-                        aria-label="Increase quantity"
+                        aria-label="Artır"
                       >
                         <Plus className="w-4 h-4" />
                       </button>
@@ -120,11 +120,11 @@ const CartPage = () => {
 
                     {/* Price */}
                     <div className="text-right">
-                      <p className="text-lg font-bold text-gray-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                      <p className="text-xl font-bold text-gray-900">
+                        {(item.price * item.quantity).toFixed(2)}₺
                       </p>
-                      <p className="text-sm text-gray-500">
-                        ${item.price} each
+                      <p className="text-sm text-gray-600">
+                        {item.price}₺ adet
                       </p>
                     </div>
                   </div>
@@ -135,7 +135,7 @@ const CartPage = () => {
                     className="sm:hidden mt-4 flex items-center justify-center space-x-2 text-red-500 hover:text-red-600 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span className="text-sm">Remove</span>
+                    <span className="text-sm">Çıkar</span>
                   </button>
                 </div>
               </div>
@@ -146,35 +146,35 @@ const CartPage = () => {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg p-6 shadow-sm sticky top-24">
               <h2 className="text-xl font-bold text-gray-900 mb-6">
-                Order Summary
+                Sipariş Özeti
               </h2>
 
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>Ara Toplam</span>
+                  <span>{subtotal.toFixed(2)}₺</span>
                 </div>
                 
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>{shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}</span>
+                  <span>Kargo</span>
+                  <span>{shipping === 0 ? 'ÜCRETSIZ' : `${shipping.toFixed(2)}₺`}</span>
                 </div>
                 
                 <div className="flex justify-between text-gray-600">
-                  <span>Tax</span>
-                  <span>${tax.toFixed(2)}</span>
+                  <span>KDV (%20)</span>
+                  <span>{tax.toFixed(2)}₺</span>
                 </div>
 
                 {shipping > 0 && (
                   <div className="bg-indigo-50 text-indigo-700 text-sm p-3 rounded-lg">
-                    Add ${(100 - subtotal).toFixed(2)} more for FREE shipping!
+                    Ücretsiz kargo için {(500 - subtotal).toFixed(2)}₺ daha ekleyin!
                   </div>
                 )}
 
                 <div className="pt-4 border-t border-gray-200">
                   <div className="flex justify-between text-xl font-bold text-gray-900">
-                    <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>Toplam</span>
+                    <span>{total.toFixed(2)}₺</span>
                   </div>
                 </div>
               </div>
@@ -183,7 +183,7 @@ const CartPage = () => {
                 to="/checkout"
                 className="w-full flex items-center justify-center space-x-2 bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors mb-4"
               >
-                <span>Proceed to Checkout</span>
+                <span>Ödemeye Geç</span>
                 <ArrowRight className="w-5 h-5" />
               </Link>
 
@@ -191,7 +191,7 @@ const CartPage = () => {
                 to="/shop"
                 className="block text-center text-indigo-600 hover:text-indigo-700 font-medium"
               >
-                Continue Shopping
+                Alışverişe Devam Et
               </Link>
 
               {/* Security Badge */}
@@ -200,7 +200,7 @@ const CartPage = () => {
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
-                  <span>Secure Checkout</span>
+                  <span>Güvenli Ödeme</span>
                 </div>
               </div>
             </div>

@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useShop } from '../context/ShopContext';
-import { 
-  ShoppingCart, 
-  Heart, 
-  Share2, 
-  Star, 
-  ChevronLeft,
-  ChevronRight,
-  Truck,
-  RotateCcw,
-  Shield,
-  Check,
-  Minus,
-  Plus
+import {
+    Check,
+    ChevronLeft,
+    ChevronRight,
+    Heart,
+    Minus,
+    Plus,
+    RotateCcw,
+    Share2,
+    Shield,
+    ShoppingCart,
+    Star,
+    Truck
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useShop } from '../context/ShopContext';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -81,7 +81,7 @@ const ProductDetailPage = () => {
     };
     
     addToCart(cartItem);
-    showToast('Product added to cart!', 'success');
+    showToast('Ürün sepete eklendi!', 'success');
   };
 
   const handleBuyNow = () => {
@@ -103,7 +103,7 @@ const ProductDetailPage = () => {
     toggleFavorite(product.id);
     const isFavorite = favorites.includes(product.id);
     showToast(
-      isFavorite ? 'Removed from favorites' : 'Added to favorites',
+      isFavorite ? 'Favorilerden çıkarıldı' : 'Favorilere eklendi',
       'success'
     );
   };
@@ -117,7 +117,7 @@ const ProductDetailPage = () => {
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      showToast('Link copied to clipboard!', 'success');
+      showToast('Bağlantı panoya kopyalandı!', 'success');
     }
   };
 
@@ -138,9 +138,9 @@ const ProductDetailPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-8">
-          <Link to="/" className="hover:text-gray-900 transition">Home</Link>
+          <Link to="/" className="hover:text-gray-900 transition">Ana Sayfa</Link>
           <span>/</span>
-          <Link to="/shop" className="hover:text-gray-900 transition">Shop</Link>
+          <Link to="/shop" className="hover:text-gray-900 transition">Mağaza</Link>
           <span>/</span>
           <span className="text-gray-900 font-medium">{product.name}</span>
         </nav>
@@ -163,7 +163,7 @@ const ProductDetailPage = () => {
                 )}
                 {product.badge && (
                   <span className="absolute top-4 right-4 bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {product.badge}
+                    {product.badge === 'NEW' ? 'YENİ' : product.badge}
                   </span>
                 )}
                 
@@ -228,7 +228,7 @@ const ProductDetailPage = () => {
                       />
                     ))}
                     <span className="ml-2 text-sm text-gray-600">
-                      {product.rating} ({product.reviews || 0} reviews)
+                      {product.rating} ({product.reviews || 0} değerlendirme)
                     </span>
                   </div>
                   <span className="text-sm text-gray-500">SKU: {product.id}</span>
@@ -237,10 +237,10 @@ const ProductDetailPage = () => {
 
               {/* Price */}
               <div className="flex items-baseline space-x-3">
-                <span className="text-4xl font-bold text-gray-900">${product.price}</span>
+                <span className="text-4xl font-bold text-gray-900">{product.price}₺</span>
                 {product.originalPrice && (
-                  <span className="text-xl text-gray-400 line-through">
-                    ${product.originalPrice}
+                  <span className="text-2xl text-gray-500 line-through ml-3">
+                    {product.originalPrice}₺
                   </span>
                 )}
               </div>
@@ -250,10 +250,10 @@ const ProductDetailPage = () => {
                 {product.inStock !== false ? (
                   <>
                     <Check className="w-5 h-5 text-green-500" />
-                    <span className="text-green-600 font-medium">In Stock</span>
+                    <span className="text-green-600 font-medium">Stokta Var</span>
                   </>
                 ) : (
-                  <span className="text-red-600 font-medium">Out of Stock</span>
+                  <span className="text-red-600 font-medium">Stokta Yok</span>
                 )}
               </div>
 
@@ -267,10 +267,10 @@ const ProductDetailPage = () => {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-sm font-semibold text-gray-900">
-                      Size: <span className="font-normal text-gray-600">{selectedSize}</span>
+                      Beden: <span className="font-normal text-gray-600">{selectedSize}</span>
                     </label>
                     <button className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
-                      Size Guide
+                      Beden Kılavuzu
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -295,7 +295,7 @@ const ProductDetailPage = () => {
               {product.colors && product.colors.length > 0 && (
                 <div>
                   <label className="text-sm font-semibold text-gray-900 block mb-3">
-                    Color: <span className="font-normal text-gray-600">{selectedColor}</span>
+                    Renk: <span className="font-normal text-gray-600">{selectedColor}</span>
                   </label>
                   <div className="flex flex-wrap gap-3">
                     {product.colors.map((color) => (
@@ -322,7 +322,7 @@ const ProductDetailPage = () => {
               {/* Quantity Selector */}
               <div>
                 <label className="text-sm font-semibold text-gray-900 block mb-3">
-                  Quantity
+                  Adet
                 </label>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center border-2 border-gray-200 rounded-lg">
@@ -343,32 +343,32 @@ const ProductDetailPage = () => {
                     </button>
                   </div>
                   <span className="text-sm text-gray-500">
-                    {product.stock || 10} available
+                    {product.stock || 10} adet mevcut
                   </span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex space-x-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                 <button
                   onClick={handleAddToCart}
                   disabled={product.inStock === false}
-                  className="flex-1 bg-gray-900 text-white px-8 py-4 rounded-xl font-semibold hover:bg-gray-800 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                  className="flex-1 bg-gray-900 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-800 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  <span>Add to Cart</span>
+                  <span>Sepete Ekle</span>
                 </button>
                 <button
                   onClick={handleBuyNow}
                   disabled={product.inStock === false}
-                  className="flex-1 bg-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="flex-1 bg-indigo-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-indigo-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  Buy Now
+                  Hemen Al
                 </button>
               </div>
 
               {/* Secondary Actions */}
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 <button
                   onClick={handleToggleFavorite}
                   className="flex-1 border-2 border-gray-200 px-6 py-3 rounded-xl font-medium hover:border-gray-300 transition flex items-center justify-center space-x-2"
@@ -378,7 +378,7 @@ const ProductDetailPage = () => {
                       isFavorite ? 'fill-red-500 text-red-500' : ''
                     }`}
                   />
-                  <span>{isFavorite ? 'Saved' : 'Save'}</span>
+                  <span>{isFavorite ? 'Kaydedildi' : 'Kaydet'}</span>
                 </button>
                 <button
                   onClick={handleShare}
@@ -393,18 +393,18 @@ const ProductDetailPage = () => {
               <div className="grid grid-cols-3 gap-4 pt-6 border-t">
                 <div className="text-center">
                   <Truck className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                  <p className="text-xs text-gray-600 font-medium">Free Shipping</p>
-                  <p className="text-xs text-gray-400">Orders over $50</p>
+                  <p className="text-xs text-gray-600 font-medium">Ücretsiz Kargo</p>
+                  <p className="text-xs text-gray-400">500₺ üstü siparişler</p>
                 </div>
                 <div className="text-center">
                   <RotateCcw className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                  <p className="text-xs text-gray-600 font-medium">30-Day Returns</p>
-                  <p className="text-xs text-gray-400">Easy returns</p>
+                  <p className="text-xs text-gray-600 font-medium">30 Gün İade</p>
+                  <p className="text-xs text-gray-400">Kolay iade</p>
                 </div>
                 <div className="text-center">
                   <Shield className="w-6 h-6 mx-auto mb-2 text-gray-400" />
-                  <p className="text-xs text-gray-600 font-medium">Secure Payment</p>
-                  <p className="text-xs text-gray-400">100% secure</p>
+                  <p className="text-xs text-gray-600 font-medium">Güvenli Ödeme</p>
+                  <p className="text-xs text-gray-400">%100 güvenli</p>
                 </div>
               </div>
             </div>
@@ -415,18 +415,18 @@ const ProductDetailPage = () => {
             <div className="max-w-6xl mx-auto px-6 lg:px-12">
               {/* Tab Navigation */}
               <div className="flex space-x-8 border-b">
-                {['description', 'specifications', 'shipping', 'reviews'].map((tab) => (
+                {[{id: 'description', label: 'Açıklama'}, {id: 'specifications', label: 'Özellikler'}, {id: 'shipping', label: 'Kargo'}, {id: 'reviews', label: 'Yorumlar'}].map((tab) => (
                   <button
-                    key={tab}
-                    onClick={() => setActiveTab(tab)}
-                    className={`py-4 px-2 font-medium capitalize transition relative ${
-                      activeTab === tab
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`py-4 px-2 font-medium transition relative ${
+                      activeTab === tab.id
                         ? 'text-indigo-600'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    {tab}
-                    {activeTab === tab && (
+                    {tab.label}
+                    {activeTab === tab.id && (
                       <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />
                     )}
                   </button>
@@ -437,27 +437,27 @@ const ProductDetailPage = () => {
               <div className="py-8">
                 {activeTab === 'description' && (
                   <div className="prose max-w-none">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Product Description</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Ürün Açıklaması</h3>
                     <p className="text-gray-600 leading-relaxed mb-4">
-                      {product.description || `The ${product.name} is a premium product designed with quality and style in mind.`}
+                      {product.description || `${product.name} kalite ve stili ön planda tutan premium bir üründür.`}
                     </p>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Key Features:</h4>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-3">Önemli Özellikler:</h4>
                     <ul className="list-disc list-inside space-y-2 text-gray-600">
-                      <li>Premium quality materials</li>
-                      <li>Durable and long-lasting construction</li>
-                      <li>Modern and stylish design</li>
-                      <li>Available in multiple sizes and colors</li>
-                      <li>Easy care and maintenance</li>
+                      <li>Premium kalite malzemeler</li>
+                      <li>Dayanıklı ve uzun ömürlü yapı</li>
+                      <li>Modern ve şık tasarım</li>
+                      <li>Birden fazla beden ve renk seçeneği</li>
+                      <li>Kolay bakım</li>
                     </ul>
                   </div>
                 )}
 
                 {activeTab === 'specifications' && (
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Specifications</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Özellikler</h3>
                     <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="border-b pb-3">
-                        <dt className="text-sm font-medium text-gray-500">Category</dt>
+                        <dt className="text-sm font-medium text-gray-500">Kategori</dt>
                         <dd className="text-base text-gray-900 capitalize">{product.category}</dd>
                       </div>
                       <div className="border-b pb-3">
@@ -466,13 +466,13 @@ const ProductDetailPage = () => {
                       </div>
                       {product.sizes && (
                         <div className="border-b pb-3">
-                          <dt className="text-sm font-medium text-gray-500">Available Sizes</dt>
+                          <dt className="text-sm font-medium text-gray-500">Mevcut Bedenler</dt>
                           <dd className="text-base text-gray-900">{product.sizes.join(', ')}</dd>
                         </div>
                       )}
                       {product.colors && (
                         <div className="border-b pb-3">
-                          <dt className="text-sm font-medium text-gray-500">Available Colors</dt>
+                          <dt className="text-sm font-medium text-gray-500">Mevcut Renkler</dt>
                           <dd className="text-base text-gray-900">{product.colors.join(', ')}</dd>
                         </div>
                       )}
@@ -482,20 +482,20 @@ const ProductDetailPage = () => {
 
                 {activeTab === 'shipping' && (
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Shipping & Returns</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Kargo ve İade</h3>
                     <div className="space-y-6">
                       <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Shipping Information</h4>
+                        <h4 className="font-semibold text-gray-900 mb-2">Kargo Bilgileri</h4>
                         <p className="text-gray-600">
-                          Free standard shipping on orders over $50. Orders are processed within 1-2 business days.
-                          Express shipping available at checkout.
+                          500₺ üstü siparişlerde ücretsiz standart kargo. Siparişler 1-2 iş günü içinde işleme alınır.
+                          Hızlı kargo seçeneği ödeme sayfasında mevcuttur.
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900 mb-2">Return Policy</h4>
+                        <h4 className="font-semibold text-gray-900 mb-2">İade Politikası</h4>
                         <p className="text-gray-600">
-                          We offer a 30-day return policy for most items. Products must be unused and in original
-                          packaging. Contact our customer service to initiate a return.
+                          Çoğu ürün için 30 günlük iade politikası sunuyoruz. Ürünler kullanılmamış ve orijinal ambalajında olmalıdır.
+                          İade başlatmak için müşteri hizmetlerimizle iletişime geçin.
                         </p>
                       </div>
                     </div>
@@ -505,9 +505,9 @@ const ProductDetailPage = () => {
                 {activeTab === 'reviews' && (
                   <div>
                     <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-bold text-gray-900">Customer Reviews</h3>
+                      <h3 className="text-xl font-bold text-gray-900">Müşteri Yorumları</h3>
                       <button className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition">
-                        Write a Review
+                        Yorum Yaz
                       </button>
                     </div>
                     
@@ -528,7 +528,7 @@ const ProductDetailPage = () => {
                               />
                             ))}
                           </div>
-                          <p className="text-sm text-gray-600 mt-1">{product.reviews || 0} reviews</p>
+                          <p className="text-sm text-gray-600 mt-1">{product.reviews || 0} yorum</p>
                         </div>
                         <div className="flex-1">
                           {[5, 4, 3, 2, 1].map((stars) => (
@@ -548,7 +548,7 @@ const ProductDetailPage = () => {
 
                     {/* Review List */}
                     <div className="space-y-6">
-                      <p className="text-gray-500 text-center py-8">No reviews yet. Be the first to review this product!</p>
+                      <p className="text-gray-500 text-center py-8">Henüz yorum yok. Bu ürünü ilk değerlendiren siz olun!</p>
                     </div>
                   </div>
                 )}
@@ -560,7 +560,7 @@ const ProductDetailPage = () => {
           {relatedProducts.length > 0 && (
             <div className="border-t bg-gray-50 px-6 lg:px-12 py-12">
               <div className="max-w-6xl mx-auto">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Bunları da Beğenebilirsiniz</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {relatedProducts.map((relatedProduct) => (
                     <Link
@@ -580,10 +580,10 @@ const ProductDetailPage = () => {
                           {relatedProduct.name}
                         </h3>
                         <div className="flex items-center space-x-2">
-                          <span className="font-bold text-gray-900">${relatedProduct.price}</span>
+                          <span className="font-bold text-gray-900">{relatedProduct.price}₺</span>
                           {relatedProduct.originalPrice && (
-                            <span className="text-sm text-gray-400 line-through">
-                              ${relatedProduct.originalPrice}
+                            <span className="text-sm text-gray-500 line-through ml-2">
+                              {relatedProduct.originalPrice}₺
                             </span>
                           )}
                         </div>

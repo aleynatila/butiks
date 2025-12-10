@@ -1,27 +1,14 @@
-import { X, ShoppingBag, Minus, Plus, Trash2 } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext';
 
 const MiniCart = ({ isOpen, onClose }) => {
   const { cart, updateCartQuantity, removeFromCart, getCartTotal } = useShop();
 
-  // Show only first 3 items in mini cart
-  const displayedItems = cart.slice(0, 3);
-  const hasMoreItems = cart.length > 3;
-
   const subtotal = getCartTotal();
 
   return (
     <>
-      {/* Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity"
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      )}
-
       {/* Drawer */}
       <div
         className={`fixed right-0 top-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${
@@ -33,13 +20,13 @@ const MiniCart = ({ isOpen, onClose }) => {
           <div className="flex items-center space-x-2">
             <ShoppingBag className="w-5 h-5 text-gray-700" />
             <h2 className="text-lg font-bold text-gray-900">
-              Shopping Cart ({cart.length})
+              Alışveriş Sepeti ({cart.length})
             </h2>
           </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-full transition"
-            aria-label="Close cart"
+            aria-label="Sepeti kapat"
           >
             <X className="w-5 h-5" />
           </button>
@@ -54,23 +41,23 @@ const MiniCart = ({ isOpen, onClose }) => {
                 <ShoppingBag className="w-12 h-12 text-gray-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Your cart is empty
+                Sepetiniz boş
               </h3>
               <p className="text-gray-600 mb-6">
-                Add some products to get started!
+                Başlamak için ürün ekleyin!
               </p>
               <button
                 onClick={onClose}
                 className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition"
               >
-                Continue Shopping
+                Alışverişe Devam Et
               </button>
             </div>
           ) : (
             <>
               {/* Cart Items */}
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {displayedItems.map((item) => (
+                {cart.map((item) => (
                   <div
                     key={item.id}
                     className="flex space-x-4 pb-4 border-b last:border-b-0"
@@ -142,51 +129,38 @@ const MiniCart = ({ isOpen, onClose }) => {
                     {/* Price */}
                     <div className="flex flex-col items-end justify-between">
                       <p className="text-sm font-bold text-gray-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {(item.price * item.quantity).toFixed(2)}₺
                       </p>
                       {item.quantity > 1 && (
                         <p className="text-xs text-gray-500">
-                          ${item.price} each
+                          {item.price}₺ adet
                         </p>
                       )}
                     </div>
                   </div>
                 ))}
-
-                {/* More Items Indicator */}
-                {hasMoreItems && (
-                  <div className="text-center py-2">
-                    <Link
-                      to="/cart"
-                      onClick={onClose}
-                      className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-                    >
-                      + {cart.length - 3} more item{cart.length - 3 > 1 ? 's' : ''} in cart
-                    </Link>
-                  </div>
-                )}
               </div>
 
               {/* Footer */}
               <div className="border-t p-6 space-y-4 bg-gray-50">
                 {/* Subtotal */}
                 <div className="flex items-center justify-between text-base">
-                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="text-gray-600">Ara Toplam:</span>
                   <span className="text-xl font-bold text-gray-900">
-                    ${subtotal.toFixed(2)}
+                    {subtotal.toFixed(2)}₺
                   </span>
                 </div>
 
                 {/* Free Shipping Notice */}
-                {subtotal < 100 && (
+                {subtotal < 500 && (
                   <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
                     <p className="text-xs text-indigo-800">
-                      Add ${(100 - subtotal).toFixed(2)} more for free shipping!
+                      Ücretsiz kargo için {(500 - subtotal).toFixed(2)}₺ daha ekleyin!
                     </p>
                     <div className="mt-2 w-full bg-indigo-200 rounded-full h-2">
                       <div
                         className="bg-indigo-600 h-2 rounded-full transition-all"
-                        style={{ width: `${Math.min((subtotal / 100) * 100, 100)}%` }}
+                        style={{ width: `${Math.min((subtotal / 500) * 100, 100)}%` }}
                       />
                     </div>
                   </div>
@@ -199,19 +173,19 @@ const MiniCart = ({ isOpen, onClose }) => {
                     onClick={onClose}
                     className="block w-full bg-white border-2 border-gray-900 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition text-center"
                   >
-                    View Cart
+                    Sepeti Gör
                   </Link>
                   <Link
                     to="/checkout"
                     onClick={onClose}
                     className="block w-full bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition text-center"
                   >
-                    Checkout
+                    Ödemeye Geç
                   </Link>
                 </div>
 
                 <p className="text-xs text-gray-500 text-center">
-                  Shipping & taxes calculated at checkout
+                  Kargo ve vergiler ödeme sırasında hesaplanır
                 </p>
               </div>
             </>

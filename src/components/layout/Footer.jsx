@@ -1,32 +1,16 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
-  Instagram,
+  ArrowUp,
+  CreditCard,
   Facebook,
-  Twitter,
+  Instagram,
   Mail,
   Phone,
-  MapPin,
   Store,
-  CreditCard,
-  ArrowUp,
-  Send
+  Twitter
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleNewsletterSubmit = (e) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setTimeout(() => {
-        setEmail('');
-        setSubscribed(false);
-      }, 3000);
-    }
-  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -36,7 +20,7 @@ const Footer = () => {
     <footer className="bg-gray-900 text-gray-300">
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           
           {/* Column 1: Brand & Description */}
           <div className="space-y-4">
@@ -45,8 +29,8 @@ const Footer = () => {
               <span className="text-2xl font-bold">BUTIKS</span>
             </Link>
             <p className="text-sm text-gray-400">
-              Your destination for curated fashion from independent boutiques worldwide. 
-              Discover unique styles and shop with confidence.
+              Dünya çapındaki bağımsız butiklerden özenle seçilmiş moda ürünlerinin adresi. 
+              Benzersiz stilleri keşfet ve güvenle alışveriş yap.
             </p>
             
             {/* Social Media Icons */}
@@ -83,36 +67,41 @@ const Footer = () => {
 
           {/* Column 2: Quick Links */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-white font-semibold mb-4">Hızlı Bağlantılar</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/about" className="text-sm hover:text-white transition-colors">
-                  About Us
+                  Hakkımızda
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-sm hover:text-white transition-colors">
-                  Contact
+                  İletişim
                 </Link>
               </li>
               <li>
                 <Link to="/faq" className="text-sm hover:text-white transition-colors">
-                  FAQ
+                  Sıkça Sorulan Sorular
                 </Link>
               </li>
               <li>
                 <Link to="/shipping" className="text-sm hover:text-white transition-colors">
-                  Shipping & Returns
+                  Kargo & İade
                 </Link>
               </li>
               <li>
                 <Link to="/size-guide" className="text-sm hover:text-white transition-colors">
-                  Size Guide
+                  Beden Rehberi
                 </Link>
               </li>
               <li>
                 <Link to="/careers" className="text-sm hover:text-white transition-colors">
-                  Careers
+                  Kariyer
+                </Link>
+              </li>
+              <li>
+                <Link to="/partnership" className="text-sm hover:text-white transition-colors font-medium text-indigo-400">
+                  Ortak Ol
                 </Link>
               </li>
             </ul>
@@ -120,31 +109,31 @@ const Footer = () => {
 
           {/* Column 3: Customer Service */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Customer Service</h3>
+            <h3 className="text-white font-semibold mb-4">Müşteri Hizmetleri</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/account" className="text-sm hover:text-white transition-colors">
-                  My Account
+                  Hesabım
                 </Link>
               </li>
               <li>
                 <Link to="/orders" className="text-sm hover:text-white transition-colors">
-                  Track Order
+                  Sipariş Takip
                 </Link>
               </li>
               <li>
                 <Link to="/wishlist" className="text-sm hover:text-white transition-colors">
-                  Wishlist
+                  Favorilerim
                 </Link>
               </li>
               <li>
                 <Link to="/privacy" className="text-sm hover:text-white transition-colors">
-                  Privacy Policy
+                  Gizlilik Politikası
                 </Link>
               </li>
               <li>
                 <Link to="/terms" className="text-sm hover:text-white transition-colors">
-                  Terms & Conditions
+                  Kullanım Koşulları
                 </Link>
               </li>
             </ul>
@@ -162,43 +151,37 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Column 4: Newsletter */}
+          {/* Column 4: About Store */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Newsletter</h3>
+            <h3 className="text-white font-semibold mb-4">BUTIKS Hakkında</h3>
             <p className="text-sm text-gray-400 mb-4">
-              Subscribe to get special offers, style tips, and exclusive deals.
+              Dünya çapındaki en iyi butiklerden özel koleksiyonlar. Kalite, özgünlük ve stil bir arada.
             </p>
-            
-            <form onSubmit={handleNewsletterSubmit} className="space-y-3">
-              <div className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none text-white placeholder-gray-500"
-                />
-              </div>
-              
-              <button
-                type="submit"
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center space-x-2"
-              >
-                <Send className="w-4 h-4" />
-                <span>Subscribe</span>
-              </button>
-              
-              {subscribed && (
-                <p className="text-sm text-green-400 text-center animate-fade-in">
-                  ✓ Successfully subscribed!
-                </p>
-              )}
-            </form>
-            
-            <p className="text-xs text-gray-500 mt-3">
-              By subscribing, you agree to our Privacy Policy.
+            <Link
+              to="/about"
+              className="inline-block text-sm text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+            >
+              Daha Fazla Bilgi →
+            </Link>
+          </div>
+        </div>
+
+        {/* Partner CTA Banner */}
+        <div className="mt-12 pt-8 border-t border-gray-800">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-6 md:p-8 text-center">
+            <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              Bir Butiğiniz mi Var?
+            </h3>
+            <p className="text-indigo-100 mb-6">
+              Platformumuza katılın ve dünya çapındaki milyonlarca moda meraklısına ulaşın
             </p>
+            <Link
+              to="/partnership"
+              className="inline-flex items-center space-x-2 bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            >
+              <Store className="w-5 h-5" />
+              <span>Ortak Ol</span>
+            </Link>
           </div>
         </div>
 
@@ -206,7 +189,7 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
             <div className="text-sm text-gray-400">
-              Secure Payment Methods
+              Güvenli Ödeme Yöntemleri
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 px-3 py-2 bg-gray-800 rounded">

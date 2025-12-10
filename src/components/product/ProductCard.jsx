@@ -1,6 +1,6 @@
+import { Eye, Heart, ShoppingBag, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingBag, Star, Eye } from 'lucide-react';
 
 const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = false }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -53,7 +53,7 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
           <div className="absolute top-3 left-3 flex flex-col space-y-2">
             {product.isNew && (
               <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                NEW
+                YENİ
               </span>
             )}
             {discount > 0 && (
@@ -63,7 +63,7 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
             )}
             {product.isSoldOut && (
               <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">
-                SOLD OUT
+                TÜKENDI
               </span>
             )}
           </div>
@@ -76,7 +76,7 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
                 ? 'bg-red-500 text-white'
                 : 'bg-white text-gray-700 hover:bg-red-500 hover:text-white'
             } shadow-md`}
-            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={isFavorite ? 'Favorilerden çıkar' : 'Favorilere ekle'}
           >
             <Heart
               className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`}
@@ -101,13 +101,13 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span className="text-sm">
-                  {product.isSoldOut ? 'Sold Out' : 'Add to Cart'}
+                  {product.isSoldOut ? 'Tükendi' : 'Sepete Ekle'}
                 </span>
               </button>
               
               <button
                 className="p-2 bg-white text-gray-900 rounded-lg hover:bg-gray-100 transition-colors"
-                aria-label="Quick view"
+                aria-label="Hızlı görüntüle"
               >
                 <Eye className="w-5 h-5" />
               </button>
@@ -153,11 +153,11 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
           {/* Price */}
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold text-gray-900">
-              ${product.price}
+              {product.price}₺
             </span>
             {product.originalPrice && (
-              <span className="text-sm text-gray-500 line-through">
-                ${product.originalPrice}
+              <span className="text-sm text-gray-500 line-through ml-2">
+                {product.originalPrice}₺
               </span>
             )}
           </div>
@@ -165,7 +165,7 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
           {/* Stock Status */}
           {!product.isSoldOut && product.stockCount && product.stockCount < 10 && (
             <p className="text-xs text-orange-500 mt-2">
-              Only {product.stockCount} left in stock!
+              Stokta sadece {product.stockCount} adet kaldı!
             </p>
           )}
         </div>
