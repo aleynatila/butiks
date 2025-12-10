@@ -96,7 +96,7 @@ const Hero = () => {
   const currentSlideData = HERO_SLIDES[currentSlide];
 
   return (
-    <div className="relative w-full h-[500px] md:h-[650px] lg:h-[750px] xl:h-[705px] overflow-hidden bg-gray-900">
+    <div className="relative w-full h-[400px] sm:h-[500px] md:h-[650px] lg:h-[750px] xl:h-[705px] overflow-hidden bg-gray-900">
       {/* Background Layer - Videos and Images */}
       <div className="absolute inset-0">
         {HERO_SLIDES.map((slide, index) => (
@@ -152,15 +152,15 @@ const Hero = () => {
                 index === currentSlide ? 'opacity-100' : 'opacity-0 absolute inset-0 pointer-events-none'
               }`}
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 md:mb-6 text-white drop-shadow-2xl">
+              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 md:mb-6 text-white drop-shadow-2xl px-4">
                 {slide.title}
               </h1>
-              <p className="text-lg md:text-xl lg:text-2xl mb-8 md:mb-10 text-white drop-shadow-lg">
+              <p className="text-sm sm:text-base md:text-xl lg:text-2xl mb-6 md:mb-10 text-white drop-shadow-lg px-4">
                 {slide.subtitle}
               </p>
               <Link
                 to={slide.ctaLink}
-                className="inline-flex items-center space-x-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl"
+                className="inline-flex items-center space-x-2 bg-white text-gray-900 px-6 py-3 md:px-8 md:py-4 rounded-lg font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-2xl text-sm md:text-base"
               >
                 <span>{slide.cta}</span>
                 <ArrowRight className="w-5 h-5" />
@@ -170,10 +170,10 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Navigation Controls */}
+      {/* Navigation Controls - Hidden on mobile */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 md:p-4 rounded-full transition-all z-50 group"
+        className="hidden md:flex absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 md:p-4 rounded-full transition-all z-50 group items-center justify-center"
         aria-label="Previous slide"
       >
         <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />
@@ -181,7 +181,7 @@ const Hero = () => {
       
       <button
         onClick={nextSlide}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 md:p-4 rounded-full transition-all z-50 group"
+        className="hidden md:flex absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/40 text-white p-3 md:p-4 rounded-full transition-all z-50 group items-center justify-center"
         aria-label="Next slide"
       >
         <ChevronRight className="w-5 h-5 md:w-6 md:h-6 group-hover:scale-110 transition-transform" />

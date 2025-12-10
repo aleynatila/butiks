@@ -1,5 +1,5 @@
 import { ChevronRight, Eye, Heart, RotateCcw, ShoppingBag, Sparkles, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import { useShop } from '../context/ShopContext';
@@ -13,9 +13,14 @@ const StyleFinderPage = () => {
   const [passedProducts, setPassedProducts] = useState([]);
   const [isAnimating, setIsAnimating] = useState(false);
   const [swipeDirection, setSwipeDirection] = useState(null);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const [dragOffset, setDragOffset] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  
+  // Use refs for touch tracking (more reliable on mobile)
+  const touchStartRef = useRef({ x: 0, y: 0 });
+  const isDraggingRef = useRef(false);
+  const cardRef = useRef(null);
+  const dragOffsetRef = useRef(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [quickViewProduct, setQuickViewProduct] = useState(null);
@@ -55,7 +60,7 @@ const StyleFinderPage = () => {
     }
     
     setLikedProducts([...likedProducts, product]);
-    showToast('Favorilere eklendi! ❤️');
+    showToast('Favorilere eklendi!');
   };
 
   const handlePass = (product = currentProduct) => {
@@ -146,32 +151,71 @@ const StyleFinderPage = () => {
     setSwipeDirection(null);
   };
 
-  // Touch handlers for mobile swipe
-  const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+  // Touch handlers using refs (to work with native event listeners)
+  const handleTouchStart = (e) => {
+    if (isAnimating) return;
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    };
+    isDraggingRef.current = true;
+    dragOffsetRef.current = 0;
+    setDragOffset(0);
   };
 
-  const onTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+  const handleTouchMove = (e) => {
+    if (!isDraggingRef.current || isAnimating) return;
     
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
+    const currentX = e.touches[0].clientX;
+    const currentY = e.touches[0].clientY;
+    const diffX = currentX - touchStartRef.current.x;
+    const diffY = Math.abs(currentY - touchStartRef.current.y);
     
-    if (isLeftSwipe) {
-      handlePass();
-    } else if (isRightSwipe) {
-      handleLike();
+    // If vertical movement is dominant, don't track horizontal
+    if (diffY > Math.abs(diffX) && Math.abs(diffX) < 10) {
+      return;
     }
     
-    setTouchStart(null);
-    setTouchEnd(null);
+    // Prevent vertical scroll while swiping horizontally
+    if (Math.abs(diffX) > 10) {
+      e.preventDefault();
+    }
+    
+    dragOffsetRef.current = diffX;
+    setDragOffset(diffX);
   };
+
+  const handleTouchEnd = () => {
+    if (!isDraggingRef.current || isAnimating) return;
+    isDraggingRef.current = false;
+    
+    const offset = dragOffsetRef.current;
+    
+    if (offset < -minSwipeDistance) {
+      handlePassAndNext();
+    } else if (offset > minSwipeDistance) {
+      handleLikeAndNext();
+    }
+    
+    dragOffsetRef.current = 0;
+    setDragOffset(0);
+  };
+
+  // Attach native touch event listeners with passive: false
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card || !isMobile) return;
+    
+    card.addEventListener('touchstart', handleTouchStart, { passive: true });
+    card.addEventListener('touchmove', handleTouchMove, { passive: false });
+    card.addEventListener('touchend', handleTouchEnd, { passive: true });
+    
+    return () => {
+      card.removeEventListener('touchstart', handleTouchStart);
+      card.removeEventListener('touchmove', handleTouchMove);
+      card.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isMobile, isAnimating, currentIndex]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -217,9 +261,9 @@ const StyleFinderPage = () => {
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Stil Seçimleriniz</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-                {likedProducts.map((product) => (
+                {likedProducts.map((product, index) => (
                   <div
-                    key={product.id}
+                    key={`liked-${product.id}-${index}`}
                     onClick={() => navigate(`/product/${product.id}`)}
                     className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all cursor-pointer group"
                   >
@@ -227,6 +271,10 @@ const StyleFinderPage = () => {
                       <img
                         src={product.image}
                         alt={product.name}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/400x400?text=Görsel+Yüklenemedi';
+                        }}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                       />
                     </div>
@@ -318,149 +366,152 @@ const StyleFinderPage = () => {
     );
   };
 
-  // Mobile Interface (Swipe)
+  // Mobile Interface (Swipe) - Full Page (Not Modal)
   const MobileInterface = () => (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6">
-      {/* Header */}
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <Sparkles className="w-8 h-8 text-gray-900" />
-          <h1 className="text-3xl font-bold text-gray-900">Stilini Bul</h1>
-        </div>
-        <p className="text-gray-600 text-lg">Beğenmek için sağa, geçmek için sola kaydır</p>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="bg-gray-200 rounded-full h-3 mb-6 overflow-hidden">
-        <div className="bg-black h-full transition-all duration-300 ease-out" style={{ width: `${progress}%` }} />
-      </div>
-
-      {/* Counter */}
-      <div className="text-center mb-6">
-        <p className="text-gray-900 font-semibold text-lg">{currentIndex + 1} / {totalProducts}</p>
-      </div>
-
-      {/* Product Card */}
-      {currentProduct && (
-        <div className="relative mb-8">
-          <div
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            className={`bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 ${
-              swipeDirection === 'right'
-                ? 'transform translate-x-full rotate-12 opacity-0'
-                : swipeDirection === 'left'
-                ? 'transform -translate-x-full -rotate-12 opacity-0'
-                : ''
-            }`}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+      {/* Top Bar - Fixed */}
+      <div className="sticky top-0 z-20 px-4 pt-4 pb-2 bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="flex items-center justify-between mb-2">
+          <button 
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg"
           >
+            <X className="w-5 h-5 text-gray-900" />
+          </button>
+          
+          {/* Progress Counter */}
+          <div className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg">
+            <p className="text-sm font-bold text-gray-900">{currentIndex + 1} / {totalProducts}</p>
+          </div>
+
+          <button 
+            onClick={handleUndo}
+            disabled={currentIndex === 0}
+            className="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg disabled:opacity-40"
+          >
+            <RotateCcw className="w-5 h-5 text-gray-900" />
+          </button>
+        </div>
+
+        {/* Slim Progress Bar */}
+        <div className="bg-white/50 backdrop-blur-sm rounded-full h-1 overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 h-full transition-all duration-300 ease-out" style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+
+      {/* Product Card Area - Flex grow to fill space */}
+      <div className="flex-1 flex items-center justify-center px-4 py-4 overflow-hidden">
+        {currentProduct && (
+          <div
+            ref={cardRef}
+            style={{ 
+              touchAction: 'pan-y', 
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              transform: swipeDirection 
+                ? swipeDirection === 'right' 
+                  ? 'translateX(100vw) rotate(15deg)' 
+                  : 'translateX(-100vw) rotate(-15deg)'
+                : `translateX(${dragOffset}px) rotate(${dragOffset * 0.03}deg)`,
+              opacity: swipeDirection ? 0 : Math.max(0.5, 1 - Math.abs(dragOffset) / 400),
+              transition: swipeDirection || dragOffset === 0 ? 'all 0.3s ease-out' : 'none'
+            }}
+            className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden relative"
+          >
+            {/* Swipe Indicator Overlays */}
+            {dragOffset > 40 && (
+              <div className="absolute inset-0 bg-green-500/30 flex items-center justify-center z-10 pointer-events-none rounded-2xl">
+                <div className="bg-green-500 text-white p-4 rounded-full shadow-lg">
+                  <Heart className="w-10 h-10 fill-current" />
+                </div>
+              </div>
+            )}
+            {dragOffset < -40 && (
+              <div className="absolute inset-0 bg-red-500/30 flex items-center justify-center z-10 pointer-events-none rounded-2xl">
+                <div className="bg-red-500 text-white p-4 rounded-full shadow-lg">
+                  <X className="w-10 h-10" />
+                </div>
+              </div>
+            )}
+            
             {/* Product Image */}
             <div className="relative aspect-[3/4] overflow-hidden bg-gray-200">
               <img
                 src={currentProduct.image}
                 alt={currentProduct.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover pointer-events-none select-none"
+                draggable="false"
               />
               
               {/* Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2 items-center">
+              <div className="absolute top-3 left-3 flex flex-col gap-2">
                 {currentProduct.isNew && (
-                  <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full text-center">
+                  <span className="bg-indigo-600 text-white text-xs font-bold px-2 py-1 rounded-full">
                     YENİ
                   </span>
                 )}
                 {currentProduct.originalPrice && (
-                  <span className="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full text-center">
-                    INDIRIM
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    %{Math.round((1 - currentProduct.price / currentProduct.originalPrice) * 100)} İNDİRİM
                   </span>
                 )}
               </div>
 
               {/* Category Badge */}
-              <div className="absolute top-4 right-4">
-                <span className="bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-medium px-3 py-1 rounded-full">
+              <div className="absolute top-3 right-3">
+                <span className="bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-medium px-2 py-1 rounded-full">
                   {currentProduct.category}
                 </span>
               </div>
             </div>
 
             {/* Product Info */}
-            <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="p-4">
+              <h2 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">
                 {currentProduct.name}
               </h2>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-2xl font-bold text-indigo-600">
+              <div className="flex items-center gap-2">
+                <span className="text-xl font-bold text-indigo-600">
                   {currentProduct.price}₺
                 </span>
                 {currentProduct.originalPrice && (
-                  <span className="text-lg text-gray-500 line-through">
+                  <span className="text-sm text-gray-400 line-through">
                     {currentProduct.originalPrice}₺
                   </span>
                 )}
               </div>
-              {currentProduct.description && (
-                <p className="text-gray-600 line-clamp-2">
-                  {currentProduct.description}
-                </p>
-              )}
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Swipe indicators (overlay) */}
-          {touchEnd && touchStart && (
-            <>
-              {touchStart - touchEnd > 20 && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-red-500 text-white p-4 rounded-full opacity-70">
-                    <X className="w-12 h-12" />
-                  </div>
-                </div>
-              )}
-              {touchStart - touchEnd < -20 && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-gradient-to-r from-pink-500 to-red-500 text-white p-4 rounded-full opacity-70">
-                    <Heart className="w-12 h-12 fill-current" />
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+      {/* Bottom Action Bar - Fixed */}
+      <div className="sticky bottom-0 z-20 bg-white/95 backdrop-blur-lg border-t border-gray-200 px-4 py-4 safe-area-inset-bottom">
+        {/* Action Buttons */}
+        <div className="flex items-center justify-center gap-8">
+          {/* Pass Button */}
+          <button
+            onClick={handlePassAndNext}
+            disabled={isAnimating}
+            className="w-16 h-16 bg-white border-2 border-gray-200 rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform disabled:opacity-50"
+            aria-label="Geç"
+          >
+            <X className="w-8 h-8 text-red-500" />
+          </button>
+
+          {/* Like Button */}
+          <button
+            onClick={handleLikeAndNext}
+            disabled={isAnimating}
+            className="w-16 h-16 bg-gradient-to-br from-pink-500 to-red-500 rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform disabled:opacity-50"
+            aria-label="Beğen"
+          >
+            <Heart className="w-8 h-8 text-white fill-white" />
+          </button>
         </div>
-      )}
-
-      {/* Action Buttons */}
-      <div className="flex items-center justify-center gap-6 mb-6">
-        {/* Pass Button */}
-        <button
-          onClick={handlePassAndNext}
-          disabled={isAnimating}
-          className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Pass"
-        >
-          <X className="w-8 h-8 text-red-500" />
-        </button>
-
-        {/* Undo Button */}
-        <button
-          onClick={handleUndo}
-          disabled={currentIndex === 0 || isAnimating}
-          className="w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Undo"
-        >
-          <RotateCcw className="w-5 h-5 text-gray-700" />
-        </button>
-
-        {/* Like Button */}
-        <button
-          onClick={handleLikeAndNext}
-          disabled={isAnimating}
-          className="w-16 h-16 bg-black rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Like"
-        >
-          <Heart className="w-8 h-8 text-white fill-current" />
-        </button>
+        
+        {/* Hint */}
+        <p className="text-center text-xs text-gray-400 mt-2">← Kaydır veya butona bas →</p>
       </div>
     </div>
   );
@@ -488,13 +539,13 @@ const StyleFinderPage = () => {
           {/* Counter & Skip */}
           <div className="flex items-center justify-between mb-6">
             <p className="text-gray-900 font-semibold text-lg">
-              Products {currentIndex + 1}-{Math.min(currentIndex + cardsPerPage, totalProducts)} of {totalProducts}
+              Ürünler {currentIndex + 1}-{Math.min(currentIndex + cardsPerPage, totalProducts)} of {totalProducts}
             </p>
             <button
               onClick={skipBatch}
               className="text-gray-600 hover:text-gray-900 font-medium flex items-center gap-2 transition-colors"
             >
-              Skip These
+              Atla
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -588,15 +639,19 @@ const StyleFinderPage = () => {
           
           {likedProducts.length > 0 ? (
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {likedProducts.slice(-5).reverse().map((product) => (
+              {likedProducts.slice(-5).reverse().map((product, index) => (
                 <div
-                  key={product.id}
+                  key={`sidebar-${product.id}-${index}`}
                   onClick={() => navigate(`/product/${product.id}`)}
                   className="flex gap-3 bg-white rounded-lg p-2 cursor-pointer hover:shadow-lg transition-all"
                 >
                   <img
                     src={product.image}
                     alt={product.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/100x100?text=Görsel';
+                    }}
                     className="w-16 h-16 object-cover rounded"
                   />
                   <div className="flex-1 min-w-0">

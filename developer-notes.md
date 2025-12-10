@@ -91,3 +91,7 @@
    - Integrated into FeaturedProducts.jsx (initial load)
    - Used Tailwind's animate-pulse for smooth pulsing effect
    - Gray-200 background color for skeleton elements
+
+23.[x] mobilede header responsive değil - Mobile menu drawer already exists with hamburger menu, works correctly on lg:hidden breakpoint
+24.[x] mobilede footer responsive değil - Fixed: Grid changed to 1/2/4 columns, payment methods wrap, Partner CTA compact, reduced padding on mobile
+25.[x] mobilede hero responsive değil okları mobilde kaldır üste geliyor bazı sayfalarda - Fixed: Arrows hidden on mobile (hidden md:flex), height responsive (400px mobile), smaller text sizes

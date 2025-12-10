@@ -51,10 +51,15 @@
     margin: 0;
     min-width: 320px;
     background-color: #FFFFFF;
+    overflow-x: hidden;
   }
 
   * {
     box-sizing: border-box;
+  }
+
+  html {
+    overflow-x: hidden;
   }
   
   /* Smooth scrolling */

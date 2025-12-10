@@ -35,7 +35,7 @@ const MOCK_URUNLER = [
     id: 2, 
     name: 'Vintage Denim Ceket', 
     price: 145, 
-    image: 'https://images.unsplash.com/photo-1550614000-4b9519e09d5c?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Dış Giyim',
     isNew: false,
     isSoldOut: false,
@@ -104,7 +104,7 @@ const MOCK_URUNLER = [
     id: 6, 
     name: 'Y2K Kelebek Crop Top', 
     price: 68, 
-    image: 'https://images.unsplash.com/photo-1485968579169-a6b7c4452c8f?w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1503342394128-c104d54dba01?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     category: 'Üst Giyim',
     isNew: false,
     isSoldOut: true,
@@ -159,16 +159,54 @@ export const ShopProvider = ({ children }) => {
   // Ürünler Durumu
   const [products] = useState(MOCK_URUNLER);
 
+  // Ürünü temizle - circular reference önleme
+  const sanitizeProduct = (product) => {
+    if (!product || typeof product !== 'object') return null;
+    return {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.image,
+      category: product.category,
+      isNew: product.isNew,
+      rating: product.rating,
+      reviews: product.reviews,
+      sizes: product.sizes,
+      colors: product.colors,
+      description: product.description,
+      stock: product.stock,
+      inStock: product.inStock,
+      quantity: product.quantity
+    };
+  };
+
   // Sepet Durumu
   const [cart, setCart] = useState(() => {
-    const kaydedilmisSepet = localStorage.getItem('butiks-sepet');
-    return kaydedilmisSepet ? JSON.parse(kaydedilmisSepet) : [];
+    try {
+      const kaydedilmisSepet = localStorage.getItem('butiks-sepet');
+      if (!kaydedilmisSepet) return [];
+      const parsed = JSON.parse(kaydedilmisSepet);
+      return Array.isArray(parsed) ? parsed.map(sanitizeProduct).filter(Boolean) : [];
+    } catch (e) {
+      console.warn('Sepet verisi bozuk, temizleniyor');
+      localStorage.removeItem('butiks-sepet');
+      return [];
+    }
   });
 
   // Favoriler Durumu
   const [favorites, setFavorites] = useState(() => {
-    const kaydedilmisFavoriler = localStorage.getItem('butiks-favoriler');
-    return kaydedilmisFavoriler ? JSON.parse(kaydedilmisFavoriler) : [];
+    try {
+      const kaydedilmisFavoriler = localStorage.getItem('butiks-favoriler');
+      if (!kaydedilmisFavoriler) return [];
+      const parsed = JSON.parse(kaydedilmisFavoriler);
+      return Array.isArray(parsed) ? parsed.map(sanitizeProduct).filter(Boolean) : [];
+    } catch (e) {
+      console.warn('Favori verisi bozuk, temizleniyor');
+      localStorage.removeItem('butiks-favoriler');
+      return [];
+    }
   });
 
   // Bildirim mesajlar
@@ -176,12 +214,22 @@ export const ShopProvider = ({ children }) => {
 
   // Sepeti localStorage'a kaydet
   useEffect(() => {
-    localStorage.setItem('butiks-sepet', JSON.stringify(cart));
+    try {
+      const cleanCart = cart.map(sanitizeProduct).filter(Boolean);
+      localStorage.setItem('butiks-sepet', JSON.stringify(cleanCart));
+    } catch (error) {
+      console.error('Sepet kaydedilemedi:', error);
+    }
   }, [cart]);
 
   // Favorileri localStorage'a kaydet
   useEffect(() => {
-    localStorage.setItem('butiks-favoriler', JSON.stringify(favorites));
+    try {
+      const cleanFavorites = favorites.map(sanitizeProduct).filter(Boolean);
+      localStorage.setItem('butiks-favoriler', JSON.stringify(cleanFavorites));
+    } catch (error) {
+      console.error('Favoriler kaydedilemedi:', error);
+    }
   }, [favorites]);
 
   // Bildirim göster
@@ -192,6 +240,8 @@ export const ShopProvider = ({ children }) => {
 
   // Sepete ekle
   const addToCart = (product, quantity = 1) => {
+    if (!product || !product.id) return;
+    
     setCart((oncekiSepet) => {
       const mevcutUrun = oncekiSepet.find((item) => item.id === product.id);
       
@@ -204,7 +254,19 @@ export const ShopProvider = ({ children }) => {
         );
       } else {
         showToast('Sepete eklendi!', 'success');
-        return [...oncekiSepet, { ...product, quantity }];
+        // Sadece gerekli alanları al, circular reference'ları önle
+        const cleanProduct = {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          image: product.image,
+          category: product.category,
+          sizes: product.sizes,
+          colors: product.colors,
+          quantity
+        };
+        return [...oncekiSepet, cleanProduct];
       }
     });
   };
@@ -237,15 +299,34 @@ export const ShopProvider = ({ children }) => {
 
   // Favori değiştir
   const toggleFavorite = (product) => {
+    if (!product || !product.id) return;
+    
     setFavorites((oncekiFavoriler) => {
       const favoriMi = oncekiFavoriler.some((fav) => fav.id === product.id);
       
       if (favoriMi) {
-        showToast('Favorilerden çkarldt', 'info');
+        showToast('Favorilerden çıkarıldı', 'info');
         return oncekiFavoriler.filter((fav) => fav.id !== product.id);
       } else {
         showToast('Favorilere eklendi!', 'success');
-        return [...oncekiFavoriler, product];
+        // Sadece gerekli alanları al, circular reference'ları önle
+        const cleanProduct = {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          originalPrice: product.originalPrice,
+          image: product.image,
+          category: product.category,
+          isNew: product.isNew,
+          rating: product.rating,
+          reviews: product.reviews,
+          sizes: product.sizes,
+          colors: product.colors,
+          description: product.description,
+          stock: product.stock,
+          inStock: product.inStock
+        };
+        return [...oncekiFavoriler, cleanProduct];
       }
     });
   };
