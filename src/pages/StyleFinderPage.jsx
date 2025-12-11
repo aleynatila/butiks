@@ -2,7 +2,7 @@ import { ChevronRight, Eye, Heart, RotateCcw, ShoppingBag, Sparkles, X } from 'l
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../context/ShopContextNew';
 
 const StyleFinderPage = () => {
   const navigate = useNavigate();

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../context/ShopContextNew';
 
 const CheckoutPage = () => {
   const { cart, getCartCount, getCartTotal, clearCart, showToast } = useShop();

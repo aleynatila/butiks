@@ -2,7 +2,7 @@ import { Filter, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import ProductCard from '../components/product/ProductCard';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../context/ShopContextNew';
 
 const CATEGORIES = ['Tümü', 'Dış Giyim', 'Üstler', 'Altlar', 'Elbiseler', 'Ayakkabılar', 'Aksesuarlar', 'Triko'];
 

@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
-import { Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+import { Outlet, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+import ProtectedRoute from './components/common/ProtectedRoute';
 import Toast from './components/common/Toast';
 import Footer from './components/layout/Footer';
 import Navbar from './components/layout/Navbar';
-import { ShopProvider, useShop } from './context/ShopContext';
+import { AuthProvider } from './context/AuthContext';
+import { ShopProvider, useShop } from './context/ShopContextNew';
 import AboutPage from './pages/AboutPage';
 import AccountPage from './pages/AccountPage';
 import AuthPage from './pages/AuthPage';
@@ -24,6 +26,19 @@ import ShopPage from './pages/ShopPage';
 import SizeGuidePage from './pages/SizeGuidePage';
 import StyleFinderPage from './pages/StyleFinderPage';
 import TermsPage from './pages/TermsPage';
+import VendorOrderDetail from './pages/vendor/orders/VendorOrderDetail';
+import VendorOrders from './pages/vendor/orders/VendorOrders';
+import VendorCategories from './pages/vendor/products/VendorCategories';
+import VendorProductCreate from './pages/vendor/products/VendorProductCreate';
+import VendorProducts from './pages/vendor/products/VendorProducts';
+import VendorAnalytics from './pages/vendor/VendorAnalytics';
+import VendorCustomers from './pages/vendor/VendorCustomers';
+import VendorDashboard from './pages/vendor/VendorDashboard';
+import VendorFinance from './pages/vendor/VendorFinance';
+import VendorHelp from './pages/vendor/VendorHelp';
+import VendorLayout from './pages/vendor/VendorLayout';
+import VendorMessages from './pages/vendor/VendorMessages';
+import VendorSettings from './pages/vendor/VendorSettings';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -36,16 +51,58 @@ function ScrollToTop() {
   return null;
 }
 
-function AppContent() {
-  const { getCartCount, favorites, toast, showToast } = useShop();
-
+// Alışveriş Layout - Navbar ve Footer ile
+function ShopLayout() {
+  const { getCartItemsCount, wishlist } = useShop();
+  
   return (
     <div className="min-h-screen flex flex-col">
-      <ScrollToTop />
-      <Navbar cartCount={getCartCount()} favoritesCount={favorites.length} />
-      
+      <Navbar cartCount={getCartItemsCount()} favoritesCount={wishlist.length} />
       <main className="flex-1">
-        <Routes>
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function AppContent() {
+  const { toast } = useShop();
+
+  return (
+    <>
+      <ScrollToTop />
+      {/* Toast Notifications */}
+      {toast && <Toast message={toast.message} type={toast.type} />}
+      
+      <Routes>
+        {/* Vendor Routes - Kendi layout'u ile, Navbar/Footer YOK */}
+        <Route
+          path="/vendor/*"
+          element={
+            <ProtectedRoute requiredRole="vendor">
+              <VendorLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<VendorDashboard />} />
+          <Route path="products" element={<VendorProducts />} />
+          <Route path="products/new" element={<VendorProductCreate />} />
+          <Route path="products/:id/edit" element={<VendorProductCreate />} />
+          <Route path="products/categories" element={<VendorCategories />} />
+          <Route path="orders" element={<VendorOrders />} />
+          <Route path="orders/:id" element={<VendorOrderDetail />} />
+          <Route path="analytics" element={<VendorAnalytics />} />
+          <Route path="finance" element={<VendorFinance />} />
+          <Route path="customers" element={<VendorCustomers />} />
+          <Route path="messages" element={<VendorMessages />} />
+          <Route path="settings" element={<VendorSettings />} />
+          <Route path="profile" element={<VendorSettings />} />
+          <Route path="help" element={<VendorHelp />} />
+        </Route>
+
+        {/* Alışveriş Sayfaları - Navbar ve Footer ile */}
+        <Route element={<ShopLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/shop" element={<ShopPage />} />
           
@@ -63,6 +120,7 @@ function AppContent() {
           <Route path="/style-finder" element={<StyleFinderPage />} />
           <Route path="/login" element={<AuthPage />} />
           <Route path="/register" element={<AuthPage />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/new-arrivals" element={<ShopPage />} />
           <Route path="/sale" element={<ShopPage />} />
           <Route path="/categories" element={<ShopPage />} />
@@ -79,29 +137,20 @@ function AppContent() {
           <Route path="/partner" element={<PartnershipPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
-        </Routes>
-      </main>
-
-      <Footer />
-
-      {/* Toast Notification */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => showToast(null)}
-        />
-      )}
-    </div>
+        </Route>
+      </Routes>
+    </>
   );
 }
 
 function App() {
   return (
     <Router>
-      <ShopProvider>
-        <AppContent />
-      </ShopProvider>
+      <AuthProvider>
+        <ShopProvider>
+          <AppContent />
+        </ShopProvider>
+      </AuthProvider>
     </Router>
   );
 }

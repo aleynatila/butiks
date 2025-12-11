@@ -6,6 +6,8 @@
  * Example: const BASE_URL = 'https://api.butiks.com/v1';
  */
 
+import storage from '../utils/storage';
+
 const BASE_URL = process.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Generic fetch wrapper with error handling
@@ -19,7 +21,7 @@ const fetchAPI = async (endpoint, options = {}) => {
   };
 
   // Add auth token if available
-  const token = localStorage.getItem('authToken');
+  const token = storage.getItem('authToken');
   if (token) {
     defaultOptions.headers['Authorization'] = `Bearer ${token}`;
   }
@@ -100,7 +102,7 @@ export const authAPI = {
     
     // Store auth token
     if (response.token) {
-      localStorage.setItem('authToken', response.token);
+      storage.setItem('authToken', response.token);
     }
     
     return response;
@@ -108,7 +110,7 @@ export const authAPI = {
 
   // Logout user
   logout: async () => {
-    localStorage.removeItem('authToken');
+    storage.removeItem('authToken');
     return fetchAPI('/auth/logout', { method: 'POST' });
   },
 

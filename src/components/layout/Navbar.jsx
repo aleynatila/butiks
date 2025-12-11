@@ -1,13 +1,13 @@
 import {
-    ChevronDown,
-    Heart,
-    Home,
-    Menu,
-    Search,
-    ShoppingBag,
-    Sparkles,
-    User,
-    X
+  ChevronDown,
+  Heart,
+  Home,
+  Menu,
+  Search,
+  ShoppingBag,
+  Sparkles,
+  User,
+  X
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -77,30 +77,41 @@ const Navbar = ({ cartCount = 0, favoritesCount = 0 }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative flex items-center justify-between h-16">
             
-            {/* Left: Hamburger Menu (Mobile) */}
-            <button
-              onClick={toggleMobileMenu}
-              className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
+            {/* Left: Hamburger Menu (Mobile) & Logo (Desktop) */}
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={toggleMobileMenu}
+                className="lg:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+                aria-label="Toggle menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
 
-            {/* Center: Logo - Always centered */}
+              {/* Logo - Left on desktop, center on mobile */}
+              <Link 
+                to="/" 
+                className="hidden lg:block text-2xl font-bold tracking-tight"
+                onClick={closeMobileMenu}
+              >
+                <span>BUTIKS</span>
+              </Link>
+            </div>
+
+            {/* Center: Logo (Mobile Only) */}
             <Link 
               to="/" 
-              className="absolute left-1/2 transform -translate-x-1/2 text-xl sm:text-2xl font-bold tracking-tight"
+              className="lg:hidden absolute left-1/2 transform -translate-x-1/2 text-xl font-bold tracking-tight"
               onClick={closeMobileMenu}
             >
               <span>BUTIKS</span>
             </Link>
 
             {/* Center: Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-1">
+            <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-center">
               {/* Kadın Dropdown */}
               <div 
                 className="relative group"

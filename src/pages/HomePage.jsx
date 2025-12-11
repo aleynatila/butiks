@@ -1,10 +1,9 @@
 import { Headphones, RefreshCw, Shield, Sparkles, Truck } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Testimonials from '../components/common/Testimonials';
 import Hero from '../components/layout/Hero';
 import FeaturedProducts from '../components/product/FeaturedProducts';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../context/ShopContextNew';
 
 // Import videos directly for better Vite handling
 import accesoriesVideo from '/accesories.mp4?url';
@@ -122,14 +121,58 @@ const CategoryCard = ({ category }) => {
 };
 
 const HomePage = () => {
-  const { products, addToCart, toggleFavorite, favorites } = useShop();
+  const { featuredProducts, loadFeaturedProducts } = useShop();
   
-  const favoriteIds = favorites.map(fav => fav.id);
+  useEffect(() => {
+    loadFeaturedProducts();
+  }, []);
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <Hero />
+
+      {/* Category Showcase */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
+            Kategoriler
+          </h2>
+          
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {CATEGORIES.map((category) => {
+              return <CategoryCard key={category.id} category={category} />;
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <FeaturedProducts 
+        products={featuredProducts}
+        title="Öne Çıkan Ürünler"
+        subtitle="Özenle seçilmiş koleksiyonlardan ürünler"
+      />
+
+      {/* Style Finder CTA */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
+        <div className="max-w-4xl mx-auto text-center">
+          <Sparkles className="w-16 h-16 text-white mx-auto mb-6" />
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Stilini Keşfet
+          </h2>
+          <p className="text-lg text-white/90 mb-8">
+            Stil Bulucu'muz, benzersiz zevkine uygun ürünleri keşfetmene yardımcı olsun. 
+            Özenle seçilmiş koleksiyonumuza göz at ve mükemmel gardırobunu oluştur.
+          </p>
+          <Link
+            to="/style-finder"
+            className="inline-block bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
+          >
+            Stil Bulucuyu Dene
+          </Link>
+        </div>
+      </section>
 
       {/* Features Section */}
       <section className="py-12 bg-white border-b border-gray-200">
@@ -177,53 +220,6 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-
-      {/* Category Showcase */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8 text-center">
-            Kategoriler
-          </h2>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {CATEGORIES.map((category) => {
-              return <CategoryCard key={category.id} category={category} />;
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <FeaturedProducts
-        products={products}
-        title="Yeni Ürünler"
-        onAddToCart={addToCart}
-        onToggleFavorite={toggleFavorite}
-        favorites={favoriteIds}
-      />
-
-      {/* Style Finder CTA */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-        <div className="max-w-4xl mx-auto text-center">
-          <Sparkles className="w-16 h-16 text-white mx-auto mb-6" />
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Stilini Keşfet
-          </h2>
-          <p className="text-lg text-white/90 mb-8">
-            Stil Bulucu'muz, benzersiz zevkine uygun ürünleri keşfetmene yardımcı olsun. 
-            Özenle seçilmiş koleksiyonumuza göz at ve mükemmel gardırobunu oluştur.
-          </p>
-          <Link
-            to="/style-finder"
-            className="inline-block bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
-          >
-            Stil Bulucuyu Dene
-          </Link>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <Testimonials />
 
 {/* Newsletter Banner
 <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-indigo-600 to-purple-600">

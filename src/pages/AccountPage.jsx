@@ -20,7 +20,8 @@ import {
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../context/ShopContextNew';
+import storage from '../utils/storage';
 
 const AccountPage = () => {
   const navigate = useNavigate();
@@ -107,7 +108,7 @@ const AccountPage = () => {
 
   // Check authentication
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
+    const token = storage.getItem('authToken');
     if (!token) {
       navigate('/login');
     } else {
@@ -116,7 +117,7 @@ const AccountPage = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
+    storage.removeItem('authToken');
     showToast('Logged out successfully', 'success');
     navigate('/');
   };

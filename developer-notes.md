@@ -95,3 +95,20 @@
 23.[x] mobilede header responsive değil - Mobile menu drawer already exists with hamburger menu, works correctly on lg:hidden breakpoint
 24.[x] mobilede footer responsive değil - Fixed: Grid changed to 1/2/4 columns, payment methods wrap, Partner CTA compact, reduced padding on mobile
 25.[x] mobilede hero responsive değil okları mobilde kaldır üste geliyor bazı sayfalarda - Fixed: Arrows hidden on mobile (hidden md:flex), height responsive (400px mobile), smaller text sizes
+
+--3.GÜN--
+
+26. [x] müşterilerimiz ne diyor kısmını homepageden kaldır about sayyfasına ekle - Testimonials component removed from HomePage and added to AboutPage before CTA section
+27. [x] Moda Topluluğumuza Katılın kısmında alışverişe başla butonu gözükmüyor - Fixed: Replaced Button component with direct Link styling, buttons now properly visible and clickable
+28. [x] 25+ Ülke kısmını kaldır about sayfasından uluslararası satış yapmıyoruz - Removed "25+ Ülke" stat from stats section, changed grid to 3 columns (md:grid-cols-3), and updated story text to remove mention of 25 countries
+29. [] mail doğrulama gelecek
+30. [x] VENDOR panel için 
+iki header var gibi onun için çzöüm nbul footer çok saçma duruyor vendor panelde
+daha çok butik sahibine odaklı bir panel sayfalar bütünü için iyice düşün
+--------------------------------------------------------------------------------------------------
+31. [x] vendor panelde mağaza profili yazıyor ya oraya bir de önizleme ekle
+32. [x] mağaza bilgilerinden Website eklemeyi kaldır zaten ürünler burada segilenecek
+33. [x] sidepanelden toplu işlemler kaldır zateb /vendor/products sayfasında var
+34. [x] /vendor/settings ve mağaza profili sayfası aynı sayfalar nasıl yapalım önizleme de olacak ya şimdi - VendorSettings.jsx oluşturuldu, 4 sekme: Mağaza Bilgileri, Mağaza Önizleme, Bildirimler, Güvenlik. Website alanı kaldırıldı. /vendor/settings ve /vendor/profile aynı sayfaya yönlendiriliyor. Sidebar'da "Toplu İşlemler" kaldırıldı, "Mağaza Profili" yerine sadece "Ayarlar" bırakıldı.
+
+35. [x] yeni ürün ekle sayfasında görsel ekleme kısmı için kırpma özelliği ekle hepsi aynı boyutta olsun küçük ise yanlarda beyazlıkk olabilir ama önerilen bir boyut olsun hepsi fix olsun - Otomatik görsel boyutlandırma eklendi: Tüm görseller 800x800px'e ayarlanıyor, küçük görsellerde beyaz padding oluşuyor, aspect ratio korunuyor. Çoklu yükleme desteği (maks 8 görsel, 5MB), format kontrolü (PNG/JPG/WEBP), görsel önizleme ve silme özellikleri eklendi.

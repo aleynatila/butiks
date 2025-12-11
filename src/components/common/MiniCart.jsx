@@ -1,6 +1,6 @@
 import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useShop } from '../../context/ShopContext';
+import { useShop } from '../../context/ShopContextNew';
 
 const MiniCart = ({ isOpen, onClose }) => {
   const { cart, updateCartQuantity, removeFromCart, getCartTotal } = useShop();
@@ -95,7 +95,7 @@ const MiniCart = ({ isOpen, onClose }) => {
                         <div className="flex items-center border border-gray-200 rounded">
                           <button
                             onClick={() =>
-                              updateCartQuantity(item.id, item.quantity - 1)
+                              updateCartQuantity(item.id, item.quantity - 1, item.selectedSize, item.selectedColor)
                             }
                             className="p-1 hover:bg-gray-50 transition"
                             aria-label="Decrease quantity"
@@ -107,7 +107,7 @@ const MiniCart = ({ isOpen, onClose }) => {
                           </span>
                           <button
                             onClick={() =>
-                              updateCartQuantity(item.id, item.quantity + 1)
+                              updateCartQuantity(item.id, item.quantity + 1, item.selectedSize, item.selectedColor)
                             }
                             className="p-1 hover:bg-gray-50 transition"
                             aria-label="Increase quantity"
@@ -117,7 +117,7 @@ const MiniCart = ({ isOpen, onClose }) => {
                         </div>
                         
                         <button
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => removeFromCart(item.id, item.selectedSize, item.selectedColor)}
                           className="p-1 text-red-500 hover:bg-red-50 rounded transition"
                           aria-label="Remove item"
                         >

@@ -1,6 +1,6 @@
 import { ArrowRight, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../context/ShopContextNew';
 
 const CartPage = () => {
   const { cart, updateCartQuantity, removeFromCart, getCartTotal, getCartCount } = useShop();

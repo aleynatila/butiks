@@ -1,32 +1,42 @@
 import { Eye, Heart, ShoppingBag, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useShop } from '../../context/ShopContextNew';
 
-const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = false }) => {
+const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const { addToCart, addToWishlist, removeFromWishlist, isInWishlist, isAuthenticated } = useShop();
 
-  const discount = product.originalPrice
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+  const productId = product._id || product.id;
+  const isFavorite = isInWishlist(productId);
+
+  const discount = product.discountPrice
+    ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
     : 0;
+
+  const finalPrice = product.discountPrice || product.price;
+  const isSoldOut = product.stock === 0;
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    if (onAddToCart && !product.isSoldOut) {
-      onAddToCart(product);
+    if (!isSoldOut) {
+      addToCart(product);
     }
   };
 
-  const handleToggleFavorite = (e) => {
+  const handleToggleFavorite = async (e) => {
     e.preventDefault();
-    if (onToggleFavorite) {
-      onToggleFavorite(product);
+    if (isFavorite) {
+      await removeFromWishlist(productId);
+    } else {
+      await addToWishlist(productId);
     }
   };
 
   return (
     <Link
-      to={`/product/${product.id}`}
+      to={`/product/${product.slug || productId}`}
       className="group block"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -36,7 +46,7 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-200">
           {/* Product Image */}
           <img
-            src={product.image}
+            src={product.images?.[0]?.url || product.image}
             alt={product.name}
             className={`w-full h-full object-cover transition-all duration-500 ${
               isHovered ? 'scale-110' : 'scale-100'
@@ -51,9 +61,9 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
 
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col space-y-2">
-            {product.isNew && (
+            {product.isFeatured && (
               <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full">
-                YENİ
+                ÖNE ÇIKAN
               </span>
             )}
             {discount > 0 && (
@@ -61,7 +71,7 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
                 -{discount}%
               </span>
             )}
-            {product.isSoldOut && (
+            {isSoldOut && (
               <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">
                 TÜKENDI
               </span>
@@ -92,16 +102,16 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
             <div className="flex space-x-2">
               <button
                 onClick={handleAddToCart}
-                disabled={product.isSoldOut}
+                disabled={isSoldOut}
                 className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-                  product.isSoldOut
+                  isSoldOut
                     ? 'bg-gray-400 cursor-not-allowed text-white'
                     : 'bg-white text-gray-900 hover:bg-gray-100'
                 }`}
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span className="text-sm">
-                  {product.isSoldOut ? 'Tükendi' : 'Sepete Ekle'}
+                  {isSoldOut ? 'Tükendi' : 'Sepete Ekle'}
                 </span>
               </button>
               
@@ -118,9 +128,9 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
         {/* Product Info */}
         <div className="p-4">
           {/* Category */}
-          {product.category && (
+          {product.categoryId?.name && (
             <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
-              {product.category}
+              {product.categoryId.name}
             </p>
           )}
 
@@ -130,21 +140,21 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
           </h3>
 
           {/* Rating */}
-          {product.rating && (
+          {product.averageRating > 0 && (
             <div className="flex items-center space-x-1 mb-2">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
                   className={`w-4 h-4 ${
-                    i < Math.floor(product.rating)
+                    i < Math.floor(product.averageRating)
                       ? 'text-yellow-400 fill-current'
                       : 'text-gray-300'
                   }`}
                 />
               ))}
-              {product.reviewCount && (
+              {product.numReviews > 0 && (
                 <span className="text-xs text-gray-500 ml-1">
-                  ({product.reviewCount})
+                  ({product.numReviews})
                 </span>
               )}
             </div>
@@ -153,19 +163,19 @@ const ProductCard = ({ product, onAddToCart, onToggleFavorite, isFavorite = fals
           {/* Price */}
           <div className="flex items-center space-x-2">
             <span className="text-lg font-bold text-gray-900">
-              {product.price}₺
+              {finalPrice}₺
             </span>
-            {product.originalPrice && (
+            {discount > 0 && (
               <span className="text-sm text-gray-500 line-through ml-2">
-                {product.originalPrice}₺
+                {product.price}₺
               </span>
             )}
           </div>
 
           {/* Stock Status */}
-          {!product.isSoldOut && product.stockCount && product.stockCount < 10 && (
+          {!isSoldOut && product.stock < 10 && (
             <p className="text-xs text-orange-500 mt-2">
-              Stokta sadece {product.stockCount} adet kaldı!
+              Stokta sadece {product.stock} adet kaldı!
             </p>
           )}
         </div>

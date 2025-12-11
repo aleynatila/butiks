@@ -96,7 +96,7 @@ const Hero = () => {
   const currentSlideData = HERO_SLIDES[currentSlide];
 
   return (
-    <div className="relative w-full h-[400px] sm:h-[500px] md:h-[650px] lg:h-[750px] xl:h-[705px] overflow-hidden bg-gray-900">
+    <div className="relative w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] overflow-hidden bg-gray-900">
       {/* Background Layer - Videos and Images */}
       <div className="absolute inset-0">
         {HERO_SLIDES.map((slide, index) => (

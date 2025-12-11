@@ -9,12 +9,12 @@ import FilterSidebar from '../components/category/FilterSidebar';
 import CategoryIcon from '../components/common/CategoryIcon';
 import ProductCard from '../components/product/ProductCard';
 import SkeletonLoader from '../components/ui/SkeletonLoader';
-import { useShop } from '../context/ShopContext';
+import { useShop } from '../context/ShopContextNew';
 import {
-    getBreadcrumbs,
-    getCategoryBySlug,
-    getCategoryPath,
-    getSubcategoryBySlug
+  getBreadcrumbs,
+  getCategoryBySlug,
+  getCategoryPath,
+  getSubcategoryBySlug
 } from '../data/categories';
 
 const CategoryPage = () => {
@@ -385,7 +385,7 @@ const CategoryPage = () => {
             {/* Empty State */}
             {filteredProducts.length === 0 && (
               <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <div className="text-6xl mb-4">🔍</div>
+                <div className="text-6xl mb-4"></div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                   Ürün Bulunamadı
                 </h3>

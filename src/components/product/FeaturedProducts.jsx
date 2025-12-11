@@ -1,19 +1,10 @@
 import { ArrowRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../product/ProductCard';
 import SkeletonLoader from '../ui/SkeletonLoader';
 
-const FeaturedProducts = ({ products, title = 'Öne Çıkan Ürünler', onAddToCart, onToggleFavorite, favorites = [] }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Simulate loading for initial render
-  useEffect(() => {
-    if (products && products.length > 0) {
-      const timer = setTimeout(() => setIsLoading(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [products]);
+const FeaturedProducts = ({ products = [], title = 'Öne Çıkan Ürünler' }) => {
+  const isLoading = !products || products.length === 0;
 
   // Show only first 8 products if more are provided
   const displayedProducts = products.slice(0, 8);
@@ -51,11 +42,8 @@ const FeaturedProducts = ({ products, title = 'Öne Çıkan Ürünler', onAddToC
           ) : (
             displayedProducts.map((product) => (
               <ProductCard
-                key={product.id}
+                key={product._id || product.id}
                 product={product}
-                onAddToCart={onAddToCart}
-                onToggleFavorite={onToggleFavorite}
-                isFavorite={favorites.includes(product.id)}
               />
             ))
           )}

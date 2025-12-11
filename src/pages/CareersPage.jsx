@@ -30,28 +30,29 @@ const CareersPage = () => {
     }
   ];
 
-  const benefits = [
-    {
-      icon: Heart,
-      title: 'Health & Wellness',
-      description: 'Comprehensive health, dental, and vision insurance for you and your family'
-    },
-    {
-      icon: Briefcase,
-      title: 'Work-Life Balance',
-      description: 'Flexible working hours, remote options, and generous PTO policy'
-    },
-    {
-      icon: Users,
-      title: 'Great Team',
-      description: 'Work with talented, passionate people in a collaborative environment'
-    },
-    {
-      icon: MapPin,
-      title: 'Growth Opportunities',
-      description: 'Professional development budget and clear career progression paths'
-    }
-  ];
+const benefits = [
+  {
+    icon: Heart,
+    title: 'Sağlık & Zindelik',
+    description: 'Sizin ve aileniz için kapsamlı sağlık, diş ve göz sigortası'
+  },
+  {
+    icon: Briefcase,
+    title: 'İş-Yaşam Dengesi',
+    description: 'Esnek çalışma saatleri, uzaktan çalışma seçenekleri ve cömert bir izin politikası'
+  },
+  {
+    icon: Users,
+    title: 'Harika Ekip',
+    description: 'Yetenekli ve tutkulu insanlarla işbirlikçi bir ortamda çalışma fırsatı'
+  },
+  {
+    icon: MapPin,
+    title: 'Gelişim Fırsatları',
+    description: 'Profesyonel gelişim bütçesi ve net kariyer ilerleme yolları'
+  }
+];
+
 
   return (
     <div className="min-h-screen bg-gray-50">

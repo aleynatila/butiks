@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import { useAuth } from '../context/AuthContext';
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const { login, register, error: authError, clearError } = useAuth();
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -20,8 +22,7 @@ const AuthPage = () => {
 
   // Register form
   const [registerData, setRegisterData] = useState({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -46,14 +47,13 @@ const AuthPage = () => {
   const validateRegister = () => {
     const newErrors = {};
     
-    if (!registerData.firstName) newErrors.firstName = 'Ad gerekli';
-    if (!registerData.lastName) newErrors.lastName = 'Soyad gerekli';
+    if (!registerData.name) newErrors.name = 'Ad Soyad gerekli';
     
     if (!registerData.email) newErrors.email = 'E-posta gerekli';
     else if (!/\S+@\S+\.\S+/.test(registerData.email)) newErrors.email = 'Geçersiz e-posta adresi';
     
     if (!registerData.password) newErrors.password = 'Şifre gerekli';
-    else if (registerData.password.length < 8) newErrors.password = 'Şifre en az 8 karakter olmalıdır';
+    else if (registerData.password.length < 6) newErrors.password = 'Şifre en az 6 karakter olmalıdır';
     
     if (!registerData.confirmPassword) newErrors.confirmPassword = 'Lütfen şifrenizi onaylayın';
     else if (registerData.password !== registerData.confirmPassword) {
@@ -68,34 +68,61 @@ const AuthPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    clearError();
     
     if (!validateLogin()) return;
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Store auth token (mock)
-      localStorage.setItem('authToken', 'mock-token-' + Date.now());
-      navigate('/account');
-    }, 1500);
+    const result = await login({
+      email: loginData.email,
+      password: loginData.password,
+    });
+    
+    setIsLoading(false);
+    
+    if (result.success) {
+      // Kullanıcı rolüne göre yönlendir
+      if (result.user.role === 'vendor') {
+        navigate('/vendor/dashboard');
+      } else if (result.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
+    } else {
+      setErrors({ submit: result.error });
+    }
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    clearError();
     
     if (!validateRegister()) return;
     
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Store auth token (mock)
-      localStorage.setItem('authToken', 'mock-token-' + Date.now());
-      navigate('/account');
-    }, 1500);
+    const result = await register({
+      name: registerData.name,
+      email: registerData.email,
+      password: registerData.password,
+    });
+    
+    setIsLoading(false);
+    
+    if (result.success) {
+      // Kullanıcı rolüne göre yönlendir
+      if (result.user.role === 'vendor') {
+        navigate('/vendor/dashboard');
+      } else if (result.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
+    } else {
+      setErrors({ submit: result.error });
+    }
   };
 
   return (
@@ -234,24 +261,14 @@ const AuthPage = () => {
           ) : (
             // Register Form
             <form onSubmit={handleRegister} className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Ad"
-                  placeholder="Ali"
-                  value={registerData.firstName}
-                  onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
-                  error={errors.firstName}
-                  required
-                />
-                <Input
-                  label="Soyad"
-                  placeholder="Yılmaz"
-                  value={registerData.lastName}
-                  onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
-                  error={errors.lastName}
-                  required
-                />
-              </div>
+              <Input
+                label="Ad Soyad"
+                placeholder="Ali Yılmaz"
+                value={registerData.name}
+                onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
+                error={errors.name}
+                required
+              />
 
               <Input
                 label="E-posta"

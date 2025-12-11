@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import storage from '../utils/storage';
 
 const ShopContext = createContext();
 
@@ -184,13 +185,13 @@ export const ShopProvider = ({ children }) => {
   // Sepet Durumu
   const [cart, setCart] = useState(() => {
     try {
-      const kaydedilmisSepet = localStorage.getItem('butiks-sepet');
+      const kaydedilmisSepet = storage.getItem('butiks-sepet');
       if (!kaydedilmisSepet) return [];
       const parsed = JSON.parse(kaydedilmisSepet);
       return Array.isArray(parsed) ? parsed.map(sanitizeProduct).filter(Boolean) : [];
     } catch (e) {
       console.warn('Sepet verisi bozuk, temizleniyor');
-      localStorage.removeItem('butiks-sepet');
+      storage.removeItem('butiks-sepet');
       return [];
     }
   });
@@ -198,13 +199,13 @@ export const ShopProvider = ({ children }) => {
   // Favoriler Durumu
   const [favorites, setFavorites] = useState(() => {
     try {
-      const kaydedilmisFavoriler = localStorage.getItem('butiks-favoriler');
+      const kaydedilmisFavoriler = storage.getItem('butiks-favoriler');
       if (!kaydedilmisFavoriler) return [];
       const parsed = JSON.parse(kaydedilmisFavoriler);
       return Array.isArray(parsed) ? parsed.map(sanitizeProduct).filter(Boolean) : [];
     } catch (e) {
       console.warn('Favori verisi bozuk, temizleniyor');
-      localStorage.removeItem('butiks-favoriler');
+      storage.removeItem('butiks-favoriler');
       return [];
     }
   });
@@ -216,7 +217,7 @@ export const ShopProvider = ({ children }) => {
   useEffect(() => {
     try {
       const cleanCart = cart.map(sanitizeProduct).filter(Boolean);
-      localStorage.setItem('butiks-sepet', JSON.stringify(cleanCart));
+      storage.setItem('butiks-sepet', JSON.stringify(cleanCart));
     } catch (error) {
       console.error('Sepet kaydedilemedi:', error);
     }
@@ -226,7 +227,7 @@ export const ShopProvider = ({ children }) => {
   useEffect(() => {
     try {
       const cleanFavorites = favorites.map(sanitizeProduct).filter(Boolean);
-      localStorage.setItem('butiks-favoriler', JSON.stringify(cleanFavorites));
+      storage.setItem('butiks-favoriler', JSON.stringify(cleanFavorites));
     } catch (error) {
       console.error('Favoriler kaydedilemedi:', error);
     }

@@ -1,12 +1,11 @@
 import { Award, Globe, Heart, ShoppingBag, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import Button from '../components/ui/Button';
+import Testimonials from '../components/common/Testimonials';
 
 const AboutPage = () => {
   const stats = [
     { label: 'Mutlu Müşteri', value: '50K+', icon: Users },
     { label: 'Ürün', value: '10K+', icon: ShoppingBag },
-    { label: 'Ülke', value: '25+', icon: Globe },
     { label: 'Yıllık Deneyim', value: '5+', icon: Award },
   ];
 
@@ -48,7 +47,7 @@ const AboutPage = () => {
       {/* Stats Section */}
       <section className="py-12 bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, index) => {
               const Icon = stat.icon;
               return (
@@ -81,7 +80,7 @@ const AboutPage = () => {
               Alışverişin bir deneyim olması gerektiğine inanıyoruz - kişisel, heyecan verici ve ödüllendirici bir deneyim. Bu yüzden stil ve kalite tutkumuzu paylaşan butiklerden özenle seçilmiş koleksiyonları bir araya getiren bir platform yarattık.
             </p>
             <p>
-              Bugün, 25 ülkede 50.000'den fazla müşteriye hizmet vermekten gurur duyuyoruz ve onlara başka hiçbir yerde bulamayacakları özel moda ürünlerine erişim sağlıyoruz.
+              Bugün, 50.000'den fazla müşteriye hizmet vermekten gurur duyuyoruz ve onlara başka hiçbir yerde bulamayacakları özel moda ürünlerine erişim sağlıyoruz.
             </p>
           </div>
         </div>
@@ -114,6 +113,9 @@ const AboutPage = () => {
         </div>
       </section>
 
+      {/* Testimonials */}
+      <Testimonials />
+
       {/* CTA Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-indigo-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center">
@@ -124,15 +126,11 @@ const AboutPage = () => {
             Dünya çapındaki butiklerden benzersiz stiller ve özel koleksiyonlar keşfedin
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/shop">
-              <Button size="lg" className="bg-white text-indigo-600 hover:bg-gray-100">
-                Alışverişe Başla
-              </Button>
+            <Link to="/shop" className="bg-white text-indigo-600 hover:bg-gray-100 px-8 py-4 rounded-lg font-semibold text-lg transition-colors inline-block">
+              Alışverişe Başla
             </Link>
-            <Link to="/contact">
-              <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-indigo-600">
-                İletişime Geçin
-              </Button>
+            <Link to="/contact" className="border-2 border-white text-white hover:bg-white hover:text-indigo-600 px-8 py-4 rounded-lg font-semibold text-lg transition-colors inline-block">
+              İletişime Geçin
             </Link>
           </div>
         </div>
