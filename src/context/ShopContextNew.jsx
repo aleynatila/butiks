@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import {
-  authService,
-  categoryService,
-  orderService,
-  productService,
-  wishlistService,
+    authService,
+    categoryService,
+    orderService,
+    productService,
+    wishlistService,
 } from '../services/api.service';
 import storage from '../utils/storage';
 
@@ -148,11 +148,15 @@ export const ShopProvider = ({ children }) => {
 
   const loadFeaturedProducts = async () => {
     try {
+      console.log('🔄 Fetching featured products from API...');
       const response = await productService.getFeaturedProducts();
+      console.log('✅ Featured products response:', response);
+      console.log('📦 Products array:', response.products);
       setFeaturedProducts(response.products || []);
       return response;
     } catch (error) {
-      console.error('Load featured products error:', error);
+      console.error('❌ Load featured products error:', error);
+      console.error('Error details:', error.response?.data || error.message);
       return { products: [] };
     }
   };

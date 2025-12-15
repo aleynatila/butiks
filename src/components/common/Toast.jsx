@@ -1,5 +1,5 @@
+import { AlertCircle, CheckCircle, Info, X, XCircle } from 'lucide-react';
 import { useEffect } from 'react';
-import { CheckCircle, XCircle, Info, AlertCircle, X } from 'lucide-react';
 
 const Toast = ({ message, type = 'success', onClose }) => {
   useEffect(() => {
@@ -25,7 +25,7 @@ const Toast = ({ message, type = 'success', onClose }) => {
   };
 
   return (
-    <div className="fixed top-20 right-4 z-50 animate-slide-in">
+    <div className="fixed top-20 right-4 z-[9999] animate-slide-in">
       <div
         className={`${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg flex items-center space-x-3 min-w-[300px] max-w-md`}
       >

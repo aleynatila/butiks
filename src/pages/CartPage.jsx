@@ -51,9 +51,9 @@ const CartPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
-            {cart.map((item) => (
+            {cart.map((item, index) => (
               <div
-                key={item.id}
+                key={`cart-item-${item.id}-${item.selectedSize || 'nosize'}-${item.selectedColor || 'nocolor'}-${index}`}
                 className="bg-white rounded-lg p-6 shadow-sm flex flex-col sm:flex-row gap-4"
               >
                 {/* Product Image */}

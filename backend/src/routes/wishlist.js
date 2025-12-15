@@ -7,6 +7,7 @@ import {
     removeFromWishlist
 } from '../controllers/wishlistController.js';
 import { protect } from '../middleware/auth.js';
+import { mongoIdValidation } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -14,9 +15,9 @@ const router = express.Router();
 router.use(protect);
 
 router.get('/', getWishlist);
-router.post('/:productId', addToWishlist);
-router.delete('/:productId', removeFromWishlist);
+router.post('/:productId', mongoIdValidation, addToWishlist);
+router.delete('/:productId', mongoIdValidation, removeFromWishlist);
 router.delete('/', clearWishlist);
-router.get('/check/:productId', checkWishlist);
+router.get('/check/:productId', mongoIdValidation, checkWishlist);
 
 export default router;

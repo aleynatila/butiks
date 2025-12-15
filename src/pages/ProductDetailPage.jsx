@@ -19,7 +19,7 @@ import { useShop } from '../context/ShopContextNew';
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { products, addToCart, toggleFavorite, favorites, showToast } = useShop();
+  const { products, addToCart, toggleFavorite, favorites, showToast, getProductBySlug } = useShop();
   
   const [product, setProduct] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
@@ -28,40 +28,60 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Find the product by ID
-    const foundProduct = products.find(p => p.id === parseInt(id));
-    
-    if (!foundProduct) {
-      navigate('/shop');
-      return;
-    }
-    
-    setProduct(foundProduct);
-    
-    // Mock multiple images (in real app, this would come from backend)
-    foundProduct.images = [
-      foundProduct.image,
-      foundProduct.image,
-      foundProduct.image,
-      foundProduct.image
-    ];
-    
-    // Set default selections
-    if (foundProduct.sizes && foundProduct.sizes.length > 0) {
-      setSelectedSize(foundProduct.sizes[0]);
-    }
-    if (foundProduct.colors && foundProduct.colors.length > 0) {
-      setSelectedColor(foundProduct.colors[0]);
-    }
-    
-    // Find related products (same category)
-    const related = products
-      .filter(p => p.category === foundProduct.category && p.id !== foundProduct.id)
-      .slice(0, 4);
-    setRelatedProducts(related);
-  }, [id, products, navigate]);
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        console.log('🔍 Loading product with id/slug:', id);
+        
+        // Try to get product by slug from API
+        const foundProduct = await getProductBySlug(id);
+        
+        if (!foundProduct) {
+          console.error('❌ Product not found');
+          showToast?.('Ürün bulunamadı', 'error');
+          navigate('/shop');
+          return;
+        }
+        
+        console.log('✅ Product loaded:', foundProduct);
+        setProduct(foundProduct);
+        
+        // Set default selections
+        if (foundProduct.variants && foundProduct.variants.length > 0) {
+          // Use variant attributes
+          const firstVariant = foundProduct.variants[0];
+          if (firstVariant.attributes?.size) {
+            setSelectedSize(firstVariant.attributes.size);
+          }
+          if (firstVariant.attributes?.color) {
+            setSelectedColor(firstVariant.attributes.color);
+          }
+        }
+        
+        // Find related products (same category)
+        if (products && products.length > 0) {
+          const related = products
+            .filter(p => 
+              p.categoryId?._id === foundProduct.categoryId?._id && 
+              p._id !== foundProduct._id
+            )
+            .slice(0, 4);
+          setRelatedProducts(related);
+        }
+      } catch (error) {
+        console.error('❌ Error loading product:', error);
+        showToast?.('Ürün yüklenirken hata oluştu', 'error');
+        navigate('/shop');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProduct();
+  }, [id, navigate]);
 
   const handleQuantityChange = (delta) => {
     const newQuantity = quantity + delta;
@@ -100,8 +120,9 @@ const ProductDetailPage = () => {
 
   const handleToggleFavorite = () => {
     if (!product) return;
-    toggleFavorite(product.id);
-    const isFavorite = favorites.includes(product.id);
+    const productId = product._id || product.id;
+    toggleFavorite(productId);
+    const isFavorite = favorites.some(fav => (fav._id || fav.id) === productId);
     showToast(
       isFavorite ? 'Favorilerden çıkarıldı' : 'Favorilere eklendi',
       'success'
@@ -121,10 +142,13 @@ const ProductDetailPage = () => {
     }
   };
 
-  if (!product) {
+  if (loading || !product) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Ürün yükleniyor...</p>
+        </div>
       </div>
     );
   }
@@ -152,7 +176,7 @@ const ProductDetailPage = () => {
               {/* Main Image */}
               <div className="relative aspect-square bg-gray-100 rounded-xl overflow-hidden group">
                 <img
-                  src={product.images[selectedImage]}
+                  src={product.images?.[selectedImage]?.url || product.images?.[selectedImage] || 'https://via.placeholder.com/500'}
                   alt={product.name}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
@@ -189,25 +213,27 @@ const ProductDetailPage = () => {
               </div>
 
               {/* Thumbnail Images */}
-              <div className="grid grid-cols-4 gap-4">
-                {product.images.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 transition ${
-                      selectedImage === index
-                        ? 'border-indigo-600'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+              {product.images && product.images.length > 1 && (
+                <div className="grid grid-cols-4 gap-4">
+                  {product.images.map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(index)}
+                      className={`aspect-square rounded-lg overflow-hidden border-2 transition ${
+                        selectedImage === index
+                          ? 'border-indigo-600'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <img
+                        src={img?.url || img}
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Product Information */}
@@ -564,13 +590,13 @@ const ProductDetailPage = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {relatedProducts.map((relatedProduct) => (
                     <Link
-                      key={relatedProduct.id}
-                      to={`/product/${relatedProduct.id}`}
+                      key={relatedProduct._id || relatedProduct.id}
+                      to={`/product/${relatedProduct.slug || relatedProduct._id || relatedProduct.id}`}
                       className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
                     >
                       <div className="aspect-square overflow-hidden">
                         <img
-                          src={relatedProduct.image}
+                          src={relatedProduct.images?.[0]?.url || relatedProduct.image}
                           alt={relatedProduct.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                         />

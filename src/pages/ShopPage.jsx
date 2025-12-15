@@ -15,9 +15,9 @@ const SORT_OPTIONS = [
 ];
 
 const ShopPage = () => {
-  const { products, addToCart, toggleFavorite, favorites } = useShop();
+  const { products, loadProducts, addToCart, toggleFavorite, favorites, productsLoading } = useShop();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState('Tümü');
   const [priceRange, setPriceRange] = useState([0, 500]);
   const [showOnSale, setShowOnSale] = useState(false);
   const [showInStock, setShowInStock] = useState(false);
@@ -28,9 +28,19 @@ const ShopPage = () => {
   
   const favoriteIds = favorites.map(fav => fav.id);
 
+  // Load products on mount
+  useEffect(() => {
+    console.log('🛍️ ShopPage: Loading all products...');
+    loadProducts();
+  }, []);
+
+  useEffect(() => {
+    console.log('🛍️ ShopPage: Products loaded:', products.length);
+  }, [products]);
+
   // Filter products
   let filteredProducts = products.filter(product => {
-    if (selectedCategory !== 'All' && product.category !== selectedCategory) return false;
+    if (selectedCategory !== 'Tümü' && product.category !== selectedCategory) return false;
     if (product.price < priceRange[0] || product.price > priceRange[1]) return false;
     if (showOnSale && !product.originalPrice) return false;
     if (showInStock && product.isSoldOut) return false;
@@ -54,7 +64,7 @@ const ShopPage = () => {
   });
 
   const clearFilters = () => {
-    setSelectedCategory('All');
+    setSelectedCategory('Tümü');
     setPriceRange([0, 500]);
     setShowOnSale(false);
     setShowInStock(false);
@@ -217,10 +227,10 @@ const ShopPage = () => {
             {/* Products Grid */}
             {filteredProducts.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProducts.slice(0, displayCount).map((product) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {filteredProducts.slice(0, displayCount).map((product, index) => (
                     <ProductCard
-                      key={product.id}
+                      key={`shop-product-${product._id || product.id}-${index}`}
                       product={product}
                       onAddToCart={addToCart}
                       onToggleFavorite={toggleFavorite}
@@ -231,9 +241,10 @@ const ShopPage = () => {
 
                 {/* Infinite Scroll Loader */}
                 {displayCount < filteredProducts.length && (
-                  <div ref={loaderRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                  <div ref={loaderRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
                     {isLoading && (
                       <>
+                        <SkeletonLoader variant="product-card" />
                         <SkeletonLoader variant="product-card" />
                         <SkeletonLoader variant="product-card" />
                         <SkeletonLoader variant="product-card" />

@@ -57,9 +57,9 @@ const MiniCart = ({ isOpen, onClose }) => {
             <>
               {/* Cart Items */}
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {cart.map((item) => (
+                {cart.map((item, index) => (
                   <div
-                    key={item.id}
+                    key={`cart-${item.id}-${item.selectedSize || 'nosize'}-${item.selectedColor || 'nocolor'}-${index}`}
                     className="flex space-x-4 pb-4 border-b last:border-b-0"
                   >
                     {/* Product Image */}

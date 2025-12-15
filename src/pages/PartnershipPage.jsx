@@ -109,19 +109,21 @@ const PartnershipPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-20">
+      <section className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <Store className="w-16 h-16 mx-auto mb-6" />
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              BUTIKS ile Ortak Olun
-            </h1>
-            <p className="text-xl md:text-2xl text-indigo-100 mb-8">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Store className="w-10 h-10" />
+              <h1 className="text-3xl md:text-4xl font-bold">
+                BUTIKS ile Ortak Olun
+              </h1>
+            </div>
+            <p className="text-lg text-indigo-100 mb-6">
               Özenle seçilmiş pazaryerimize katılın ve butiğinizi dünya çapında moda severlerle buluşturun
             </p>
             <a
               href="#application-form"
-              className="inline-block bg-white text-indigo-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
+              className="inline-block bg-white text-indigo-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all shadow-lg"
             >
               Ortak Ol
             </a>

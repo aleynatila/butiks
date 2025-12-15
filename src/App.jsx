@@ -9,6 +9,7 @@ import { ShopProvider, useShop } from './context/ShopContextNew';
 import AboutPage from './pages/AboutPage';
 import AccountPage from './pages/AccountPage';
 import AuthPage from './pages/AuthPage';
+import BestSellersPage from './pages/BestSellersPage';
 import CareersPage from './pages/CareersPage';
 import CartPage from './pages/CartPage';
 import CategoryPage from './pages/CategoryPage';
@@ -17,10 +18,13 @@ import ContactPage from './pages/ContactPage';
 import FAQPage from './pages/FAQPage';
 import FavoritesPage from './pages/FavoritesPage';
 import HomePage from './pages/HomePage';
+import MessagesPage from './pages/MessagesPage';
+import OrdersPage from './pages/OrdersPage';
 import OrderTrackingPage from './pages/OrderTrackingPage';
 import PartnershipPage from './pages/PartnershipPage';
 import PrivacyPage from './pages/PrivacyPage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ReviewsPage from './pages/ReviewsPage';
 import ShippingPage from './pages/ShippingPage';
 import ShopPage from './pages/ShopPage';
 import SizeGuidePage from './pages/SizeGuidePage';
@@ -115,6 +119,10 @@ function AppContent() {
           <Route path="/favorites" element={<FavoritesPage />} />
           <Route path="/wishlist" element={<FavoritesPage />} />
           <Route path="/account" element={<AccountPage />} />
+          <Route path="/orders" element={<OrdersPage />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/best-sellers" element={<BestSellersPage />} />
           <Route path="/product/:id" element={<ProductDetailPage />} />
           <Route path="/checkout" element={<CheckoutPageNew />} />
           <Route path="/style-finder" element={<StyleFinderPage />} />
@@ -132,7 +140,7 @@ function AppContent() {
           <Route path="/shipping" element={<ShippingPage />} />
           <Route path="/size-guide" element={<SizeGuidePage />} />
           <Route path="/careers" element={<CareersPage />} />
-          <Route path="/orders" element={<OrderTrackingPage />} />
+          <Route path="/order-tracking" element={<OrderTrackingPage />} />
           <Route path="/partnership" element={<PartnershipPage />} />
           <Route path="/partner" element={<PartnershipPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />

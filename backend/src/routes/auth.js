@@ -10,14 +10,16 @@ import {
     updateProfile
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
+import { loginLimiter, passwordResetLimiter } from '../middleware/rateLimiter.js';
+import { loginValidation, registerValidation } from '../middleware/validation.js';
 
 const router = express.Router();
 
 // Public routes
-router.post('/register', register);
-router.post('/login', login);
-router.post('/password-reset', requestPasswordReset);
-router.post('/password-reset/confirm', resetPassword);
+router.post('/register', registerValidation, register);
+router.post('/login', loginLimiter, loginValidation, login);
+router.post('/password-reset', passwordResetLimiter, requestPasswordReset);
+router.post('/password-reset/confirm', passwordResetLimiter, resetPassword);
 
 // Protected routes
 router.get('/profile', protect, getProfile);

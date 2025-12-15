@@ -40,9 +40,9 @@ const FeaturedProducts = ({ products = [], title = 'Öne Çıkan Ürünler' }) =
               <SkeletonLoader key={index} variant="product-card" />
             ))
           ) : (
-            displayedProducts.map((product) => (
+            displayedProducts.map((product, index) => (
               <ProductCard
-                key={product._id || product.id}
+                key={`featured-${product._id || product.id}-${index}`}
                 product={product}
               />
             ))

@@ -91,7 +91,16 @@ const AuthPage = () => {
         navigate('/');
       }
     } else {
-      setErrors({ submit: result.error });
+      // Daha kullanıcı dostu hata mesajları
+      let errorMessage = result.error;
+      if (errorMessage.includes('401') || errorMessage.includes('Unauthorized') || errorMessage.includes('Invalid')) {
+        errorMessage = 'E-posta veya şifre hatalı. Lütfen kontrol edip tekrar deneyin.';
+      } else if (errorMessage.includes('429') || errorMessage.includes('Rate limit') || errorMessage.includes('çok fazla')) {
+        errorMessage = 'Çok fazla deneme yaptınız. Lütfen birkaç dakika bekleyip tekrar deneyin.';
+      } else if (errorMessage.includes('Network') || errorMessage.includes('network')) {
+        errorMessage = 'Bağlantı hatası. İnternet bağlantınızı kontrol edin.';
+      }
+      setErrors({ submit: errorMessage });
     }
   };
 

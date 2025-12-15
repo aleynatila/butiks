@@ -1,8 +1,8 @@
 import { Headphones, RefreshCw, Shield, Sparkles, Truck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Hero from '../components/layout/Hero';
 import FeaturedProducts from '../components/product/FeaturedProducts';
+import PersonalizedProducts from '../components/product/PersonalizedProducts';
 import { useShop } from '../context/ShopContextNew';
 
 // Import videos directly for better Vite handling
@@ -121,16 +121,32 @@ const CategoryCard = ({ category }) => {
 };
 
 const HomePage = () => {
-  const { featuredProducts, loadFeaturedProducts } = useShop();
+  const { featuredProducts, products, loadFeaturedProducts, loadProducts } = useShop();
   
   useEffect(() => {
+    console.log('🏠 HomePage: Loading featured products...');
     loadFeaturedProducts();
+    loadProducts({ limit: 20 }); // Load 20 products for personalized section
   }, []);
+
+  useEffect(() => {
+    console.log('🏠 HomePage: Featured products:', featuredProducts);
+  }, [featuredProducts]);
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <Hero />
+      {/* Personalized Products Slider - EN ÜSTTE */}
+      <PersonalizedProducts 
+        products={products}
+        title="Sana Özel Ürünler"
+      />
+
+      {/* Featured Products */}
+      <FeaturedProducts 
+        products={featuredProducts}
+        title="Öne Çıkan Ürünler"
+        subtitle="Özenle seçilmiş koleksiyonlardan ürünler"
+      />
 
       {/* Category Showcase */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
@@ -147,30 +163,30 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <FeaturedProducts 
-        products={featuredProducts}
-        title="Öne Çıkan Ürünler"
-        subtitle="Özenle seçilmiş koleksiyonlardan ürünler"
-      />
-
       {/* Style Finder CTA */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-        <div className="max-w-4xl mx-auto text-center">
-          <Sparkles className="w-16 h-16 text-white mx-auto mb-6" />
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Stilini Keşfet
-          </h2>
-          <p className="text-lg text-white/90 mb-8">
-            Stil Bulucu'muz, benzersiz zevkine uygun ürünleri keşfetmene yardımcı olsun. 
-            Özenle seçilmiş koleksiyonumuza göz at ve mükemmel gardırobunu oluştur.
-          </p>
-          <Link
-            to="/style-finder"
-            className="inline-block bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 shadow-xl"
-          >
-            Stil Bulucuyu Dene
-          </Link>
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-purple-600 to-indigo-600">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
+            <div className="flex items-center gap-4 text-center md:text-left">
+              <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl md:text-2xl font-bold text-white">
+                  Stilini Keşfet
+                </h3>
+                <p className="text-sm text-white/80 mt-1">
+                  Sana özel ürünler
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/style-finder"
+              className="flex-shrink-0 bg-white text-purple-600 px-6 py-2.5 rounded-full font-semibold hover:bg-gray-100 transition-all transform hover:scale-105 shadow-md text-sm md:text-base"
+            >
+              Keşfet
+            </Link>
+          </div>
         </div>
       </section>
 

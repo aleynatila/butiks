@@ -447,8 +447,8 @@ const CheckoutPage = () => {
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-3">Sipariş Ürünleri</h3>
                       <div className="space-y-3">
-                        {cart.map((item) => (
-                          <div key={item.id} className="flex items-center gap-4">
+                        {cart.map((item, index) => (
+                          <div key={`checkout-${item.id}-${item.selectedSize || 'nosize'}-${item.selectedColor || 'nocolor'}-${index}`} className="flex items-center gap-4">
                             <img
                               src={item.image}
                               alt={item.name}

@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
   const forgotPassword = async (email) => {
     try {
       setError(null);
-      await authService.forgotPassword(email);
+      await authService.requestPasswordReset(email);
       return { success: true };
     } catch (error) {
       const errorMessage = error.message || 'İşlem başarısız';
@@ -128,10 +128,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const resetPassword = async (token, password) => {
+  const resetPassword = async (token, newPassword) => {
     try {
       setError(null);
-      await authService.resetPassword(token, password);
+      await authService.resetPassword(token, newPassword);
       return { success: true };
     } catch (error) {
       const errorMessage = error.message || 'Şifre sıfırlanamadı';

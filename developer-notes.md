@@ -112,3 +112,28 @@ daha çok butik sahibine odaklı bir panel sayfalar bütünü için iyice düş�
 34. [x] /vendor/settings ve mağaza profili sayfası aynı sayfalar nasıl yapalım önizleme de olacak ya şimdi - VendorSettings.jsx oluşturuldu, 4 sekme: Mağaza Bilgileri, Mağaza Önizleme, Bildirimler, Güvenlik. Website alanı kaldırıldı. /vendor/settings ve /vendor/profile aynı sayfaya yönlendiriliyor. Sidebar'da "Toplu İşlemler" kaldırıldı, "Mağaza Profili" yerine sadece "Ayarlar" bırakıldı.
 
 35. [x] yeni ürün ekle sayfasında görsel ekleme kısmı için kırpma özelliği ekle hepsi aynı boyutta olsun küçük ise yanlarda beyazlıkk olabilir ama önerilen bir boyut olsun hepsi fix olsun - Otomatik görsel boyutlandırma eklendi: Tüm görseller 800x800px'e ayarlanıyor, küçük görsellerde beyaz padding oluşuyor, aspect ratio korunuyor. Çoklu yükleme desteği (maks 8 görsel, 5MB), format kontrolü (PNG/JPG/WEBP), görsel önizleme ve silme özellikleri eklendi.
+
+
+[x]Sana Özel Ürünler kısmında ok işaretleri lazım ve burası sayfanın en üstünde olacak 
+[x]home page de hero yerine daha kompakt kısa bir çözüm için düşün
+
+
+İndirim Kuponlarım ve kuponlarım diye bir bölüm yok onları kaldır
+hesabım dropdown ın içine ekle
+Aleyna Atila (hesap sahibi)
+Tüm Siparişlerim
+Değerlendirmelerim
+Satıcı Mesajlarım
+Kullanıcı Bilgilerim
+Çıkış Yap
+
+
+bir de sana özel ürünler kısmındaki okların üstne gelince cursor pointer olsun tıklanabilir olduğunu anlasın kullanıcı
+
+
+Stilini Keşfet
+Benzersiz tarzına uygun ürünleri keşfet
+burası için daha iyisini yapabilirsin diye düşünüyorum enhance without emojis
+
+
+homepage structure için düşün ve en iyi user experience nasıl olur planla ve seçenekler sun

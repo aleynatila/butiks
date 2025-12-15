@@ -22,6 +22,7 @@ export const getProducts = async (req, res, next) => {
 
     // Build query
     const query = { status: 'active', isPublished: true };
+    console.log('📦 getProducts query:', query);
 
     if (category) query.categoryId = category;
     if (vendorId) query.vendorId = vendorId;
@@ -60,6 +61,8 @@ export const getProducts = async (req, res, next) => {
       .limit(parseInt(limit))
       .lean();
 
+    console.log('📦 getProducts found:', products.length, 'products');
+
     res.status(200).json({
       error: false,
       products,
@@ -85,6 +88,49 @@ export const getProduct = async (req, res, next) => {
       .populate('vendorId', 'shopName slug logo description stats address social')
       .populate('categoryId', 'name slug')
       .populate('subcategoryId', 'name slug');
+
+    if (!product) {
+      return res.status(404).json({
+        error: true,
+        message: 'Product not found'
+      });
+    }
+
+    // Increment view count
+    product.stats.viewCount += 1;
+    await product.save();
+
+    res.status(200).json({
+      error: false,
+      product
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get single product by ID or slug
+// @route   GET /api/v1/products/slug/:idOrSlug
+// @access  Public
+export const getProductByIdOrSlug = async (req, res, next) => {
+  try {
+    const { idOrSlug } = req.params;
+    let product;
+
+    // Check if it's a valid MongoDB ObjectId
+    if (idOrSlug.match(/^[0-9a-fA-F]{24}$/)) {
+      product = await Product.findById(idOrSlug)
+        .populate('vendorId', 'shopName slug logo description stats address social')
+        .populate('categoryId', 'name slug')
+        .populate('subcategoryId', 'name slug');
+    } else {
+      // Try to find by slug
+      product = await Product.findOne({ slug: idOrSlug, status: 'active', isPublished: true })
+        .populate('vendorId', 'shopName slug logo description stats address social')
+        .populate('categoryId', 'name slug')
+        .populate('subcategoryId', 'name slug');
+    }
 
     if (!product) {
       return res.status(404).json({
@@ -245,7 +291,8 @@ export const getFeaturedProducts = async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit) || 12;
 
-    const products = await Product.find({
+    // First, try to get products with high ratings
+    let products = await Product.find({
       status: 'active',
       isPublished: true,
       'stats.rating': { $gte: 4 }
@@ -254,6 +301,20 @@ export const getFeaturedProducts = async (req, res, next) => {
       .sort('-stats.rating -stats.soldCount')
       .limit(limit)
       .lean();
+
+    // If no high-rated products found, get any active published products
+    if (products.length === 0) {
+      products = await Product.find({
+        status: 'active',
+        isPublished: true
+      })
+        .populate('vendorId', 'shopName slug logo')
+        .sort('-createdAt')
+        .limit(limit)
+        .lean();
+    }
+
+    console.log('📦 Featured products found:', products.length);
 
     res.status(200).json({
       error: false,

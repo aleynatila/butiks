@@ -39,7 +39,7 @@ const storage = {
         return memoryStorage.get(key) || null;
       }
     } catch (error) {
-      console.warn(`Storage access error for key "${key}":`, error.message);
+      // Silently fallback to memory storage
       return memoryStorage.get(key) || null;
     }
   },
@@ -57,7 +57,7 @@ const storage = {
       // Always set in memory as backup
       memoryStorage.set(key, value);
     } catch (error) {
-      console.warn(`Storage write error for key "${key}":`, error.message);
+      // Silently fallback to memory storage
       memoryStorage.set(key, value);
     }
   },
@@ -73,7 +73,7 @@ const storage = {
       }
       memoryStorage.delete(key);
     } catch (error) {
-      console.warn(`Storage removal error for key "${key}":`, error.message);
+      // Silently fallback to memory storage
       memoryStorage.delete(key);
     }
   },
@@ -88,7 +88,7 @@ const storage = {
       }
       memoryStorage.clear();
     } catch (error) {
-      console.warn('Storage clear error:', error.message);
+      // Silently fallback to memory storage
       memoryStorage.clear();
     }
   },

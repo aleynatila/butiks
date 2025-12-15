@@ -37,10 +37,14 @@ apiClient.interceptors.response.use(
 
       switch (status) {
         case 401:
-          // Unauthorized - clear token and redirect to login
-          storage.removeItem('authToken');
-          storage.removeItem('user');
-          if (window.location.pathname !== '/auth') {
+          // Unauthorized - only clear and redirect if not on auth pages
+          const isAuthPage = ['/auth', '/login', '/register'].includes(window.location.pathname);
+          const isLoginRequest = error.config?.url?.includes('/auth/login');
+          
+          // Don't clear tokens if this is a login attempt that failed
+          if (!isAuthPage && !isLoginRequest) {
+            storage.removeItem('authToken');
+            storage.removeItem('user');
             window.location.href = '/auth';
           }
           break;
@@ -56,8 +60,8 @@ apiClient.interceptors.response.use(
           break;
 
         case 429:
-          // Too many requests
-          console.error('Rate limit exceeded. Please try again later.');
+          // Too many requests - add friendly message to error
+          data.message = 'Çok fazla deneme yaptınız. Lütfen birkaç dakika sonra tekrar deneyin.';
           break;
 
         case 500:

@@ -7,13 +7,13 @@ export const API_ENDPOINTS = {
   LOGIN: '/auth/login',
   LOGOUT: '/auth/logout',
   PROFILE: '/auth/profile',
-  CHANGE_PASSWORD: '/auth/change-password',
-  REQUEST_PASSWORD_RESET: '/auth/request-password-reset',
-  RESET_PASSWORD: '/auth/reset-password',
+  CHANGE_PASSWORD: '/auth/password',
+  REQUEST_PASSWORD_RESET: '/auth/password-reset',
+  RESET_PASSWORD: '/auth/password-reset/confirm',
 
   // Products
   PRODUCTS: '/products',
-  PRODUCT_BY_SLUG: (slug) => `/products/${slug}`,
+  PRODUCT_BY_SLUG: (slug) => `/products/slug/${slug}`,
   FEATURED_PRODUCTS: '/products/featured',
   VENDOR_PRODUCTS: (vendorId) => `/products/vendor/${vendorId}`,
   CATEGORY_PRODUCTS: (slug) => `/products/category/${slug}`,

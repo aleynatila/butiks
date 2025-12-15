@@ -28,6 +28,39 @@ const seedData = async () => {
 
     console.log('Vendor oluşturuldu:', vendor.email);
 
+    // Create customer users
+    const customer1 = await User.create({
+      firstName: 'Ayşe',
+      lastName: 'Yılmaz',
+      name: 'Ayşe Yılmaz',
+      email: 'customer1@butiks.com',
+      password: 'Customer123!',
+      role: 'customer',
+      phone: '+905551112233',
+    });
+
+    const customer2 = await User.create({
+      firstName: 'Mehmet',
+      lastName: 'Demir',
+      name: 'Mehmet Demir',
+      email: 'customer2@butiks.com',
+      password: 'Customer123!',
+      role: 'customer',
+      phone: '+905554445566',
+    });
+
+    const customer3 = await User.create({
+      firstName: 'Zeynep',
+      lastName: 'Kaya',
+      name: 'Zeynep Kaya',
+      email: 'customer3@butiks.com',
+      password: 'Customer123!',
+      role: 'customer',
+      phone: '+905557778899',
+    });
+
+    console.log('Customer kullanıcıları oluşturuldu:', customer1.email, customer2.email, customer3.email);
+
     // Create categories
     const categories = await Category.insertMany([
       {

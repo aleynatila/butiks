@@ -19,25 +19,27 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LogoutModal from '../components/common/LogoutModal';
 import Button from '../components/ui/Button';
+import { useAuth } from '../context/AuthContext';
 import { useShop } from '../context/ShopContextNew';
-import storage from '../utils/storage';
 
 const AccountPage = () => {
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout: authLogout, updateProfile: updateAuthProfile, loading } = useAuth();
   const { favorites, showToast } = useShop();
   const [activeTab, setActiveTab] = useState('profile');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // User profile data
   const [userData, setUserData] = useState({
-    firstName: 'Jane',
-    lastName: 'Doe',
-    email: 'jane.doe@example.com',
-    phone: '+1 (555) 123-4567',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     avatar: null,
-    memberSince: 'January 2024'
+    memberSince: ''
   });
 
   // Mock orders data
@@ -106,25 +108,53 @@ const AccountPage = () => {
     }
   ]);
 
-  // Check authentication
+  // Check authentication and load user data
   useEffect(() => {
-    const token = storage.getItem('authToken');
-    if (!token) {
-      navigate('/login');
-    } else {
-      setIsAuthenticated(true);
+    if (!loading) {
+      if (!isAuthenticated) {
+        navigate('/login');
+      } else if (user) {
+        // Set user data from AuthContext
+        setUserData({
+          firstName: user.firstName || user.name?.split(' ')[0] || '',
+          lastName: user.lastName || user.name?.split(' ')[1] || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          avatar: user.avatar || null,
+          memberSince: user.createdAt ? new Date(user.createdAt).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' }) : ''
+        });
+      }
     }
-  }, [navigate]);
+  }, [isAuthenticated, loading, user, navigate]);
 
-  const handleLogout = () => {
-    storage.removeItem('authToken');
-    showToast('Logged out successfully', 'success');
-    navigate('/');
+  const handleLogout = async () => {
+    setShowLogoutModal(false);
+    try {
+      await authLogout();
+      window.location.href = '/';
+    } catch (error) {
+      showToast('Çıkış yapılırken bir hata oluştu', 'error');
+    }
   };
 
-  const handleSaveProfile = () => {
-    setIsEditing(false);
-    showToast('Profile updated successfully', 'success');
+  const handleSaveProfile = async () => {
+    try {
+      const result = await updateAuthProfile({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        phone: userData.phone,
+      });
+      
+      if (result.success) {
+        setIsEditing(false);
+        showToast('Profil başarıyla güncellendi', 'success');
+      } else {
+        showToast(result.error || 'Profil güncellenemedi', 'error');
+      }
+    } catch (error) {
+      showToast('Profil güncellenirken bir hata oluştu', 'error');
+    }
   };
 
   const handleDeleteAddress = (id) => {
@@ -157,6 +187,17 @@ const AccountPage = () => {
       </span>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return null; // Will redirect in useEffect
@@ -258,7 +299,7 @@ const AccountPage = () => {
                 </button>
 
                 <button
-                  onClick={handleLogout}
+                  onClick={() => setShowLogoutModal(true)}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors mt-4"
                 >
                   <LogOut className="w-5 h-5" />
@@ -630,6 +671,13 @@ const AccountPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Logout Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 };

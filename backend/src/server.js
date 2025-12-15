@@ -8,12 +8,19 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import connectDB from './config/database.js';
 import errorHandler from './middleware/errorHandler.js';
+import { requestLogger } from './middleware/logger.js';
+import { initScheduledTasks } from './utils/scheduler.js';
 
 // Load environment variables
 dotenv.config();
 
 // Connect to database
 connectDB();
+
+// Initialize scheduled tasks (only in production)
+if (process.env.NODE_ENV === 'production') {
+  initScheduledTasks();
+}
 
 // Initialize express app
 const app = express();
@@ -78,6 +85,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
+// Custom request logger
+app.use(requestLogger);
+
 // API Routes
 const API_VERSION = process.env.API_VERSION || 'v1';
 
@@ -138,7 +148,7 @@ app.use(errorHandler);
 // Start server
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   console.log(`📍 API endpoint: http://localhost:${PORT}/api/${API_VERSION}`);
   console.log(`💚 Health check: http://localhost:${PORT}/health\n`);
@@ -147,6 +157,26 @@ app.listen(PORT, () => {
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.error('❌ Unhandled Rejection:', err.message);
+  console.error(err.stack);
+  // Close server & exit process in production
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err.message);
+  console.error(err.stack);
   // Close server & exit process
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('👋 SIGTERM received. Shutting down gracefully...');
+  server.close(() => {
+    console.log('✅ Process terminated');
+  });
   process.exit(1);
 });
